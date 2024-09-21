@@ -9,7 +9,7 @@ using osu.Game.Configuration;
 using osu.Game.Overlays.Settings;
 using osuTK;
 
-namespace osu.Game.Rulesets.Osu.Mods
+namespace osu.Game.Rulesets.Osu.Mods.CipherTransformers
 {
     public class CircleDanceTransformerMod : OsuModCipher
     {
