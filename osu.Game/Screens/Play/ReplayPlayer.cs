@@ -152,7 +152,7 @@ namespace osu.Game.Screens.Play
 
         public void SeekInDirection(float amount)
         {
-            double target = Math.Clamp(GameplayClockContainer.CurrentTime + amount * BASE_SEEK_AMOUNT, 0, GameplayState.Beatmap.GetLastObjectTime());
+            double target = Math.Clamp(GameplayClockContainer.CurrentTime + amount * BASE_SEEK_AMOUNT, double.NegativeInfinity, GameplayState.Beatmap.GetLastObjectTime());
 
             Seek(target);
         }
