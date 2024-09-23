@@ -33,6 +33,27 @@ namespace osu.Game.Rulesets.Osu.Mods.CipherHelpers
             return bitRepresentation[currentIndex++];
         }
 
+        public string GetBits(int length)
+        {
+            int bitsToRead = length;
+
+            if (!AreBitsLeft(length))
+            {
+                Logger.Log("Whole plaintext was read. Supplying '0's from now on.");
+                bitsToRead = bitRepresentation.Length - currentIndex;
+            }
+
+            string bits = bitRepresentation.Substring(currentIndex, bitsToRead);
+            currentIndex += bitsToRead;
+
+            return bits.PadRight(length, '0');
+        }
+
+        public string GetBits()
+        {
+            return GetBits(bitRepresentation.Length - currentIndex);
+        }
+
         public void ResetIndex()
         {
             currentIndex = 0;
