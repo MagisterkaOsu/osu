@@ -24,8 +24,15 @@ namespace osu.Game.Rulesets.Osu.Mods.CipherTransformers
             char yBit = Plaintext.GetBit();
 
             Vector2 result = mousePosition;
-            result.X = xBit == '1' ? FloatHelper.ReplaceFraction(mousePosition.X, "5") : FloatHelper.ReplaceFraction(mousePosition.X, "0");
-            result.Y = yBit == '1' ? FloatHelper.ReplaceFraction(mousePosition.Y, "5") : FloatHelper.ReplaceFraction(mousePosition.Y, "0");
+            if (xBit == '1')
+                FloatHelper.ReplaceFraction(ref result.X, "5");
+            else
+                FloatHelper.ReplaceFraction(ref result.X, "0");
+
+            if (yBit == '1')
+                FloatHelper.ReplaceFraction(ref result.Y, "5");
+            else
+                FloatHelper.ReplaceFraction(ref result.Y, "0");
             return result;
         }
     }
