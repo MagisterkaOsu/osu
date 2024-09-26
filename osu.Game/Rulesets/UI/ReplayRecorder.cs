@@ -81,7 +81,7 @@ namespace osu.Game.Rulesets.UI
 
             var position = ScreenSpaceToGamefield?.Invoke(inputManager.CurrentState.Mouse.Position) ?? inputManager.CurrentState.Mouse.Position;
 
-            if (TransformMouseInput != null) position = TransformMouseInput.Invoke(position);
+            if (TransformMouseInput != null && pressedActions.Count == 0) position = TransformMouseInput.Invoke(position);
 
             var frame = HandleFrame(position, pressedActions, last);
 
