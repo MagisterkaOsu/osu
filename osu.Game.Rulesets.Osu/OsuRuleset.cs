@@ -23,6 +23,7 @@ using osu.Game.Rulesets.Osu.Difficulty;
 using osu.Game.Rulesets.Osu.Edit;
 using osu.Game.Rulesets.Osu.Edit.Setup;
 using osu.Game.Rulesets.Osu.Mods;
+using osu.Game.Rulesets.Osu.Mods.CipherTransformers;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.Osu.Scoring;
@@ -157,7 +158,8 @@ namespace osu.Game.Rulesets.Osu
                 case ModType.Ciphers:
                     return new Mod[]
                     {
-                        new CircleDanceTransformerMod()
+                        new CircleDanceTransformerMod(),
+                        new HalvesTransformerMod()
                     };
 
                 case ModType.DifficultyReduction:

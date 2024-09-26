@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Mods
         public override double ScoreMultiplier => 1;
 
         [SettingSource("Plaintext", "Enter text to encode", SettingControlType = typeof(SettingsTextBox))]
-        public Bindable<string> Plaintext { get; } = new Bindable<string>("Test String");
+        public Bindable<string> PlaintextBindable { get; } = new Bindable<string>("Test String");
 
         public Func<Vector2, Vector2>? TransformMouseInputDelegate;
         public virtual Func<Vector2, Vector2>? TransformMouseInput { get; set; }
