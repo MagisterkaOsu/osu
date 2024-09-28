@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Mods
         public override IconUsage? Icon => OsuIcon.PlayStyleKeyboard;
         public override double ScoreMultiplier => 1;
 
-        [SettingSource("Plaintext", "Enter text to encode", SettingControlType = typeof(SettingsTextBox))]
+        [SettingSource("Plaintext", "Enter text to encode", 0, SettingControlType = typeof(SettingsTextBox))]
         public Bindable<string> PlaintextBindable { get; } = new Bindable<string>("Test String");
 
         public Func<Vector2, Vector2>? TransformMouseInputDelegate;
