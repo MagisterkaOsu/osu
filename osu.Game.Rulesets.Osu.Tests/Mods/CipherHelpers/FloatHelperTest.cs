@@ -108,5 +108,31 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods.CipherHelpers
             Assert.AreEqual("110011", FloatHelper.GetLastMantissaBits(input, 6));
             Assert.AreEqual("00000000000000000110011", FloatHelper.GetLastMantissaBits(input, 23));
         }
+
+        [Test]
+        public void TestSetNthMantissaBit()
+        {
+            string mantissaBits = "00000000000000000000000";
+
+            FloatHelper.SetNthMantissaBit(ref mantissaBits, 0, '1');
+            Assert.AreEqual("00000000000000000000001", mantissaBits);
+
+            FloatHelper.SetNthMantissaBit(ref mantissaBits, 1, '1');
+            Assert.AreEqual("00000000000000000000011", mantissaBits);
+
+            FloatHelper.SetNthMantissaBit(ref mantissaBits, 0, '0');
+            Assert.AreEqual("00000000000000000000010", mantissaBits);
+        }
+
+        [Test]
+        public void TestSetMantissaBitsWithMask()
+        {
+            int mask = 0b110011;
+            string mantissaBits = "00000000000000000000000";
+            string bitsToSet = "1010";
+
+            FloatHelper.SetMantissaBitsWithMask(ref mantissaBits, mask, bitsToSet);
+            Assert.AreEqual("00000000000000000100010", mantissaBits);
+        }
     }
 }

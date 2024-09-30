@@ -23,6 +23,6 @@ namespace osu.Game.Rulesets.Mods
         public Bindable<string> PlaintextBindable { get; } = new Bindable<string>("Test String");
 
         public Func<Vector2, Vector2>? TransformMouseInputDelegate;
-        public virtual Func<Vector2, Vector2>? TransformMouseInput { get; set; }
+        public virtual Func<Vector2, bool, Vector2>? TransformMouseInput { get; set; }
     }
 }
