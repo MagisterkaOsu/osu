@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -71,8 +72,8 @@ namespace osu.Game.Rulesets.Osu.UI
             if (changeCoords)
             {
                 Vector2 position = replayFrames[currentFrame].Position;
-                replayPlayerX.Value = position.X.ToString();
-                replayPlayerY.Value = position.Y.ToString();
+                replayPlayerX.Value = position.X.ToString(CultureInfo.InvariantCulture);
+                replayPlayerY.Value = position.Y.ToString(CultureInfo.InvariantCulture);
             }
         }
     }
