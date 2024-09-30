@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using NUnit.Framework;
 using osu.Game.Rulesets.Osu.Mods.CipherHelpers;
 
@@ -9,7 +10,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods.CipherHelpers
     [TestFixture]
     public class InputHelperTest
     {
-        private InputHelper inputHelper;
+        private InputHelper inputHelper { get; set; } = null!;
 
         [SetUp]
         public void SetUp()
@@ -59,7 +60,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods.CipherHelpers
 
             Assert.AreEqual(40, bits.Length);
             Assert.AreEqual("0111010001100101011100110111010000000000", bits);
-            Assert.IsTrue(bits.EndsWith("0000"));
+            Assert.IsTrue(bits.EndsWith("0000", StringComparison.Ordinal));
         }
 
         [Test]

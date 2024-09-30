@@ -54,51 +54,51 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods.CipherHelpers
         public void TestReplaceMantissaBits_Valid_Smallest()
         {
             float input = 5.75f;
-            string newMantissaBits = "00000000000000000000001";
-            float expectedOutput = 4.0000004f;
+            const string new_mantissa_bits = "00000000000000000000001";
+            const float expected_output = 4.0000004f;
 
-            FloatHelper.ReplaceMantissaBits(ref input, newMantissaBits);
+            FloatHelper.ReplaceMantissaBits(ref input, new_mantissa_bits);
 
-            Assert.AreEqual(expectedOutput, input, 0.000001f);
+            Assert.AreEqual(expected_output, input, 0.000001f);
         }
 
         [Test]
         public void TestReplaceMantissaBits_Valid_Max()
         {
             float input = 1.5f;
-            string newMantissaBits = "11111111111111111111111";
-            float expectedOutput = 1.9999999f;
+            const string new_mantissa_bits = "11111111111111111111111";
+            const float expected_output = 1.9999999f;
 
-            FloatHelper.ReplaceMantissaBits(ref input, newMantissaBits);
+            FloatHelper.ReplaceMantissaBits(ref input, new_mantissa_bits);
 
-            Assert.AreEqual(expectedOutput, input);
+            Assert.AreEqual(expected_output, input);
         }
 
         [Test]
         public void TestReplaceMantissaBits_InvalidMantissa_ThrowsArgumentException()
         {
             float input = 3.5f;
-            string invalidMantissa = "10101";
+            const string invalid_mantissa = "10101";
 
-            Assert.Throws<ArgumentException>(() => FloatHelper.ReplaceMantissaBits(ref input, invalidMantissa));
+            Assert.Throws<ArgumentException>(() => FloatHelper.ReplaceMantissaBits(ref input, invalid_mantissa));
         }
 
         [Test]
         public void TestReplaceMantissaBits_ValidMantissa_ZeroMantissa()
         {
             float input = 10.0f;
-            string newMantissaBits = "00000000000000000000000";
-            float expectedOutput = 8.0f;
+            const string new_mantissa_bits = "00000000000000000000000";
+            const float expected_output = 8.0f;
 
-            FloatHelper.ReplaceMantissaBits(ref input, newMantissaBits);
+            FloatHelper.ReplaceMantissaBits(ref input, new_mantissa_bits);
 
-            Assert.AreEqual(expectedOutput, input);
+            Assert.AreEqual(expected_output, input);
         }
 
         [Test]
         public void TestGetLastMantissaBits()
         {
-            float input = 8.000049f;
+            const float input = 8.000049f;
 
             Assert.AreEqual("1", FloatHelper.GetLastMantissaBits(input, 1));
             Assert.AreEqual("11", FloatHelper.GetLastMantissaBits(input, 2));
@@ -127,11 +127,11 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods.CipherHelpers
         [Test]
         public void TestSetMantissaBitsWithMask()
         {
-            int mask = 0b110011;
+            const int mask = 0b110011;
             string mantissaBits = "00000000000000000000000";
-            string bitsToSet = "1010";
+            const string bits_to_set = "1010";
 
-            FloatHelper.SetMantissaBitsWithMask(ref mantissaBits, mask, bitsToSet);
+            FloatHelper.SetMantissaBitsWithMask(ref mantissaBits, mask, bits_to_set);
             Assert.AreEqual("00000000000000000100010", mantissaBits);
         }
     }

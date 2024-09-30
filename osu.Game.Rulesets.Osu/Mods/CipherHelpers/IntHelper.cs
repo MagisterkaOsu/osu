@@ -5,7 +5,7 @@ namespace osu.Game.Rulesets.Osu.Mods.CipherHelpers
 {
     public class IntHelper
     {
-        public static int GetAmountOf1sInMask(int mask)
+        public static int GetAmountOf1SInMask(int mask)
         {
             int count = 0;
 

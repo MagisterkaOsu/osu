@@ -56,7 +56,7 @@ namespace osu.Game.Rulesets.Osu.Mods.CipherTransformers
             if (Mask.Value == null)
                 return;
 
-            bool toEncode = Plaintext.GetBits().Length >= 0;
+            bool toEncode = Plaintext.GetBits().Length > 0;
 
             if (toEncode)
             {
@@ -64,9 +64,9 @@ namespace osu.Game.Rulesets.Osu.Mods.CipherTransformers
                 FloatHelper.SetNthMantissaBit(ref xMantissaBits, 0, '1');
                 FloatHelper.ReplaceMantissaBits(ref mousePosition.X, xMantissaBits);
 
-                int mask1sAmount = IntHelper.GetAmountOf1sInMask((int)Mask.Value);
+                int mask1SAmount = IntHelper.GetAmountOf1SInMask((int)Mask.Value);
 
-                string messageBits = Plaintext.GetBits(mask1sAmount);
+                string messageBits = Plaintext.GetBits(mask1SAmount);
 
                 string yMantissaBits = FloatHelper.GetMantissaBits(mousePosition.Y);
                 FloatHelper.SetMantissaBitsWithMask(ref yMantissaBits, (int)Mask.Value, messageBits);
