@@ -52,7 +52,7 @@ namespace osu.Game.Rulesets.Osu.UI
                 ReplayReadCoords readCoords;
                 PlayfieldAdjustmentContainer.Add(readCoords = new ReplayReadCoords(replayPlayer.Score.Replay));
                 Overlays.Add(readCoords.CreateProxy().With(p => p.Depth = float.NegativeInfinity));
-                replayPlayer.AddSettings(new ReplayShowCoords(Config));
+                replayPlayer.AddSettings(new ReplayShowCoords(Config), true);
 
                 cursorHideEnabled = Config.GetBindable<bool>(OsuRulesetSetting.ReplayCursorHideEnabled);
 
