@@ -22,7 +22,7 @@ namespace osu.Game.Overlays
     public partial class SettingsToolboxGroup : Container, IExpandable
     {
         private readonly string title;
-        public const int CONTAINER_WIDTH = 270;
+        public const int CONTAINER_WIDTH = 400;
 
         private const float transition_duration = 250;
         private const int header_height = 30;
@@ -40,7 +40,7 @@ namespace osu.Game.Overlays
             Direction = FillDirection.Vertical,
             RelativeSizeAxes = Axes.X,
             AutoSizeAxes = Axes.Y,
-            Padding = new MarginPadding { Horizontal = 10, Top = 5, Bottom = 10 },
+            Padding = new MarginPadding { Horizontal = 5, Top = 5, Bottom = 10 },
             Spacing = new Vector2(0, 15),
         };
 
