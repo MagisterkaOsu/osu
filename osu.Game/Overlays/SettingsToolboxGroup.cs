@@ -25,7 +25,7 @@ namespace osu.Game.Overlays
         public const int CONTAINER_WIDTH = 400;
 
         private const float transition_duration = 250;
-        private const int header_height = 30;
+        private const int header_height = 20;
         private const int corner_radius = 5;
 
         private readonly Cached headerTextVisibilityCache = new Cached();
@@ -40,8 +40,8 @@ namespace osu.Game.Overlays
             Direction = FillDirection.Vertical,
             RelativeSizeAxes = Axes.X,
             AutoSizeAxes = Axes.Y,
-            Padding = new MarginPadding { Horizontal = 5, Top = 5, Bottom = 10 },
-            Spacing = new Vector2(0, 15),
+            Padding = new MarginPadding { Horizontal = 5, Top = 5, Bottom = 5 },
+            Spacing = new Vector2(0, 5),
         };
 
         public BindableBool Expanded { get; } = new BindableBool(true);
