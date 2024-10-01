@@ -4,6 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Configuration;
+using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Screens.Play.PlayerSettings;
 
@@ -15,25 +16,25 @@ namespace osu.Game.Rulesets.Osu.UI
 
         // BindableNumber<float> creates a slider, but SettingsNumberBox only accepts an int. That's why a textBox needs to be used.
 
-        [SettingSource("X (float)")]
+        [SettingSource("X (float)", SettingControlType = typeof(SettingsSpriteText))]
         public Bindable<string> ReplayPlayerX { get; } = new Bindable<string>
         {
             Default = string.Empty,
         };
 
-        [SettingSource("X (binary)")]
+        [SettingSource("X (binary)", SettingControlType = typeof(SettingsSpriteText))]
         public Bindable<string> ReplayPlayerXBinary { get; } = new Bindable<string>
         {
             Default = string.Empty,
         };
 
-        [SettingSource("Y (float)")]
+        [SettingSource("Y (float)", SettingControlType = typeof(SettingsSpriteText))]
         public Bindable<string> ReplayPlayerY { get; } = new Bindable<string>
         {
             Default = string.Empty,
         };
 
-        [SettingSource("Y (binary)")]
+        [SettingSource("Y (binary)", SettingControlType = typeof(SettingsSpriteText))]
         public Bindable<string> ReplayPlayerYBinary { get; } = new Bindable<string>
         {
             Default = string.Empty,

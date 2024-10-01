@@ -3,13 +3,12 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.Osu.Replays;
@@ -31,7 +30,6 @@ namespace osu.Game.Rulesets.Osu.UI
         public ReplayReadCoords(Replay replay)
         {
             RelativeSizeAxes = Axes.Both;
-            InternalChild = sprite = new OsuSpriteText();
             replayFrames = replay.Frames.Cast<OsuReplayFrame>().ToList();
         }
 
@@ -47,8 +45,6 @@ namespace osu.Game.Rulesets.Osu.UI
         // protected override void LoadComplete()
         // {
         // }
-
-        OsuSpriteText sprite;
 
         protected override void Update()
         {
@@ -81,11 +77,10 @@ namespace osu.Game.Rulesets.Osu.UI
             {
                 Vector2 position = replayFrames[currentFrame].Position;
 
-                sprite.Text = position.X.ToString();
-                // replayPlayerX.Value = position.X.ToString();
-                // replayPlayerY.Value = position.Y.ToString();
-                // replayPlayerXBinary.Value = getBitRepresentationOfPosition(position.X);
-                // replayPlayerYBinary.Value = getBitRepresentationOfPosition(position.Y);
+                replayPlayerX.Value = position.X.ToString(CultureInfo.InvariantCulture);
+                replayPlayerY.Value = position.Y.ToString(CultureInfo.InvariantCulture);
+                replayPlayerXBinary.Value = getBitRepresentationOfPosition(position.X);
+                replayPlayerYBinary.Value = getBitRepresentationOfPosition(position.Y);
             }
         }
 
