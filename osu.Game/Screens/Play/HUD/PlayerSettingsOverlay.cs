@@ -33,8 +33,8 @@ namespace osu.Game.Screens.Play.HUD
                 Spacing = new Vector2(0, 20),
                 Children = new PlayerSettingsGroup[]
                 {
-                    VisualSettings = new VisualSettings { Expanded = { Value = false } },
-                    new AudioSettings { Expanded = { Value = false } }
+                    // VisualSettings = new VisualSettings { Expanded = { Value = false } },
+                    // new AudioSettings { Expanded = { Value = false } }
                 }
             };
         }

@@ -15,21 +15,32 @@ namespace osu.Game.Rulesets.Osu.UI
 
         // BindableNumber<float> creates a slider, but SettingsNumberBox only accepts an int. That's why a textBox needs to be used.
 
-        [SettingSource("X", "Current player X")]
+        [SettingSource("X (float)")]
         public Bindable<string> ReplayPlayerX { get; } = new Bindable<string>
         {
             Default = string.Empty,
-            // Disabled = true //It will throw an exception if the value changes, even if it is changed in the code.
         };
 
-        [SettingSource("Y", "Current player Y")]
+        [SettingSource("X (binary)")]
+        public Bindable<string> ReplayPlayerXBinary { get; } = new Bindable<string>
+        {
+            Default = string.Empty,
+        };
+
+        [SettingSource("Y (float)")]
         public Bindable<string> ReplayPlayerY { get; } = new Bindable<string>
         {
             Default = string.Empty,
         };
 
+        [SettingSource("Y (binary)")]
+        public Bindable<string> ReplayPlayerYBinary { get; } = new Bindable<string>
+        {
+            Default = string.Empty,
+        };
+
         public ReplayShowCoords(OsuRulesetConfigManager config)
-            : base("Player Coords")
+            : base("Player coordinates")
         {
             this.config = config;
         }
@@ -41,6 +52,10 @@ namespace osu.Game.Rulesets.Osu.UI
 
             config.BindWith(OsuRulesetSetting.ReplayPlayerX, ReplayPlayerX);
             config.BindWith(OsuRulesetSetting.ReplayPlayerY, ReplayPlayerY);
+            config.BindWith(OsuRulesetSetting.ReplayPlayerXBinary, ReplayPlayerXBinary);
+            config.BindWith(OsuRulesetSetting.ReplayPlayerYBinary, ReplayPlayerYBinary);
+
+
         }
     }
 }
