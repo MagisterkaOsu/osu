@@ -10,6 +10,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Replays;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.Osu.Replays;
 using osuTK;
@@ -24,14 +25,18 @@ namespace osu.Game.Rulesets.Osu.UI
         private Bindable<string> replayPlayerY { get; set; } = new Bindable<string>("0");
         private Bindable<string> replayPlayerYBinary { get; set; } = new Bindable<string>("0b0");
 
+        private readonly Replay replay;
         private readonly List<OsuReplayFrame> replayFrames;
+        private readonly IReadOnlyList<Mod> mods;
         private int currentFrame = -1;
         private double lastTime = double.MinValue;
 
-        public ReplayReadCoords(Replay replay)
+        public ReplayReadCoords(Replay replay, IReadOnlyList<Mod> mods = null)
         {
             RelativeSizeAxes = Axes.Both;
+            this.replay = replay;
             replayFrames = replay.Frames.Cast<OsuReplayFrame>().ToList();
+            this.mods = mods?.ToArray() ?? Array.Empty<Mod>();
         }
 
         [BackgroundDependencyLoader]
@@ -46,7 +51,11 @@ namespace osu.Game.Rulesets.Osu.UI
 
         protected override void LoadComplete()
         {
-            decodedString.Value = "a";
+            // pass replay to decoder to set decodedString value
+            foreach (var mod in mods.OfType<IDecodesReplay>())
+            {
+                if (mod.DecodedString != null) decodedString.Value = mod.DecodedString.Invoke(replay.Frames);
+            }
         }
 
         protected override void Update()

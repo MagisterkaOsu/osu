@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Osu.UI
                 replayPlayer.AddSettings(new ReplayAnalysisSettings(Config));
 
                 ReplayReadCoords readCoords;
-                PlayfieldAdjustmentContainer.Add(readCoords = new ReplayReadCoords(replayPlayer.Score.Replay));
+                PlayfieldAdjustmentContainer.Add(readCoords = new ReplayReadCoords(replayPlayer.Score.Replay, replayPlayer.Mods.Value));
                 Overlays.Add(readCoords.CreateProxy().With(p => p.Depth = float.NegativeInfinity));
                 replayPlayer.AddSettings(new ReplayShowCoords(Config), true);
 
