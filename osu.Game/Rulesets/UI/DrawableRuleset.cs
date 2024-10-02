@@ -340,6 +340,12 @@ namespace osu.Game.Rulesets.UI
                 // The cursor is hidden by default (see Playfield.load()), but should be shown when there's a replay
                 Playfield.Cursor?.Show();
             }
+
+            // pass replay to decoder
+            foreach (var mod in Mods.OfType<IDecodesReplay>())
+            {
+                if (mod.DecodedString != null) mod.DecodedString.Invoke(replayScore.Replay.Frames);
+            }
         }
 
         /// <summary>

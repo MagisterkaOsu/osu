@@ -2,16 +2,18 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Overlays.Settings;
+using osu.Game.Rulesets.Replays;
 using osuTK;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public abstract class ModCipher : Mod, ITransformsReplayRecorder
+    public abstract class ModCipher : Mod, ITransformsReplayRecorder, IDecodesReplay
     {
         public override string Name => "Cipher";
         public override string Acronym => "CIP";
@@ -24,5 +26,6 @@ namespace osu.Game.Rulesets.Mods
 
         public Func<Vector2, Vector2>? TransformMouseInputDelegate;
         public virtual Func<Vector2, Vector2>? TransformMouseInput { get; set; }
+        public virtual Func<List<ReplayFrame>, string>? DecodedString { get; set; }
     }
 }
