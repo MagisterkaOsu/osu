@@ -18,6 +18,7 @@ namespace osu.Game.Rulesets.Osu.UI
 {
     public partial class ReplayReadCoords : CompositeDrawable
     {
+        private Bindable<string> decodedString { get; set; } = new Bindable<string>("");
         private Bindable<string> replayPlayerX { get; set; } = new Bindable<string>("0");
         private Bindable<string> replayPlayerXBinary { get; set; } = new Bindable<string>("0b0");
         private Bindable<string> replayPlayerY { get; set; } = new Bindable<string>("0");
@@ -36,15 +37,17 @@ namespace osu.Game.Rulesets.Osu.UI
         [BackgroundDependencyLoader]
         private void load(OsuRulesetConfigManager config)
         {
+            config.BindWith(OsuRulesetSetting.DecodedString, decodedString);
             config.BindWith(OsuRulesetSetting.ReplayPlayerX, replayPlayerX);
             config.BindWith(OsuRulesetSetting.ReplayPlayerXBinary, replayPlayerXBinary);
             config.BindWith(OsuRulesetSetting.ReplayPlayerY, replayPlayerY);
             config.BindWith(OsuRulesetSetting.ReplayPlayerYBinary, replayPlayerYBinary);
         }
 
-        // protected override void LoadComplete()
-        // {
-        // }
+        protected override void LoadComplete()
+        {
+            decodedString.Value = "a";
+        }
 
         protected override void Update()
         {
