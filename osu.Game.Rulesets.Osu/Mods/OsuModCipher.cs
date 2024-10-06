@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public InputHelper Plaintext = null!;
 
-        public override Func<Vector2, Vector2>? TransformMouseInput
+        public override Func<Vector2, bool, Vector2>? TransformMouseInput
         {
             get => Transform;
             set => base.TransformMouseInput = value;
@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         /// <summary>
         /// Runs every replay frame used by ReplayRecorder
         /// </summary>
-        public abstract Vector2 Transform(Vector2 mousePosition);
+        public abstract Vector2 Transform(Vector2 mousePosition, bool pressedActions);
 
         public void ApplyToBeatmap(IBeatmap beatmap)
         {

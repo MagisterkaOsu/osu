@@ -76,7 +76,6 @@ namespace osu.Game.Rulesets.Osu.UI
             if (changeCoords)
             {
                 Vector2 position = replayFrames[currentFrame].Position;
-
                 replayPlayerX.Value = position.X.ToString(CultureInfo.InvariantCulture);
                 replayPlayerY.Value = position.Y.ToString(CultureInfo.InvariantCulture);
                 replayPlayerXBinary.Value = getBitRepresentationOfPosition(position.X);
