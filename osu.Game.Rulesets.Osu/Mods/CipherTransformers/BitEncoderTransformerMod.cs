@@ -2,12 +2,16 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Osu.Mods.CipherHelpers;
+using osu.Game.Rulesets.Osu.Replays;
+using osu.Game.Rulesets.Replays;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Mods.CipherTransformers
@@ -24,6 +28,8 @@ namespace osu.Game.Rulesets.Osu.Mods.CipherTransformers
 
         private bool wroteFirstFrame;
         private Random random = new Random();
+
+        #region Encode
 
         public override Vector2 Transform(Vector2 mousePosition, bool pressedActions)
         {
@@ -91,5 +97,17 @@ namespace osu.Game.Rulesets.Osu.Mods.CipherTransformers
                 FloatHelper.ReplaceMantissaBits(ref mousePosition.X, mantissaBits);
             }
         }
+
+        #endregion
+
+        #region Decode
+
+        public override string Decode(List<ReplayFrame> frames)
+        {
+            List<OsuReplayFrame> replayFrames = frames.Cast<OsuReplayFrame>().ToList();
+            return "";
+        }
+
+        #endregion
     }
 }
