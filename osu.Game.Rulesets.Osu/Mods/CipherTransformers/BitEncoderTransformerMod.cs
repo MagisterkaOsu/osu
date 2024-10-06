@@ -23,6 +23,7 @@ namespace osu.Game.Rulesets.Osu.Mods.CipherTransformers
         public Bindable<int?> Mask { get; } = new Bindable<int?>(0);
 
         private bool wroteFirstFrame;
+        private Random random = new Random();
 
         public override Vector2 Transform(Vector2 mousePosition, bool pressedActions)
         {
@@ -53,24 +54,35 @@ namespace osu.Game.Rulesets.Osu.Mods.CipherTransformers
 
         private void transformNthFrame(ref Vector2 mousePosition)
         {
-            if (Mask.Value == null)
+            if (Mask.Value == null || Mask.Value == 0)
                 return;
 
-            bool toEncode = Plaintext.GetBits().Length > 0;
+            bool bitsLeftToEncode = Plaintext.GetBits().Length > 0;
 
-            if (toEncode)
+            if (bitsLeftToEncode)
             {
-                string xMantissaBits = FloatHelper.GetMantissaBits(mousePosition.X);
-                FloatHelper.SetNthMantissaBit(ref xMantissaBits, 0, '1');
-                FloatHelper.ReplaceMantissaBits(ref mousePosition.X, xMantissaBits);
+                bool toEncode = random.Next(2) != 0;
 
-                int mask1SAmount = IntHelper.GetAmountOf1SInMask((int)Mask.Value);
+                if (toEncode)
+                {
+                    string xMantissaBits = FloatHelper.GetMantissaBits(mousePosition.X);
+                    FloatHelper.SetNthMantissaBit(ref xMantissaBits, 0, '1');
+                    FloatHelper.ReplaceMantissaBits(ref mousePosition.X, xMantissaBits);
 
-                string messageBits = Plaintext.GetBits(mask1SAmount);
+                    int mask1SAmount = IntHelper.GetAmountOf1SInMask((int)Mask.Value);
 
-                string yMantissaBits = FloatHelper.GetMantissaBits(mousePosition.Y);
-                FloatHelper.SetMantissaBitsWithMask(ref yMantissaBits, (int)Mask.Value, messageBits);
-                FloatHelper.ReplaceMantissaBits(ref mousePosition.Y, yMantissaBits);
+                    string messageBits = Plaintext.GetBits(mask1SAmount);
+
+                    string yMantissaBits = FloatHelper.GetMantissaBits(mousePosition.Y);
+                    FloatHelper.SetMantissaBitsWithMask(ref yMantissaBits, (int)Mask.Value, messageBits);
+                    FloatHelper.ReplaceMantissaBits(ref mousePosition.Y, yMantissaBits);
+                }
+                else
+                {
+                    string xMantissaBits = FloatHelper.GetMantissaBits(mousePosition.X);
+                    FloatHelper.SetNthMantissaBit(ref xMantissaBits, 0, '0');
+                    FloatHelper.ReplaceMantissaBits(ref mousePosition.X, xMantissaBits);
+                }
             }
             else
             {
