@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Osu.Mods.CipherHelpers
         {
             if (newMantissaBits.Length != 23 || !System.Text.RegularExpressions.Regex.IsMatch(newMantissaBits, "^[01]+$"))
             {
-                throw new ArgumentException("newMantissaBits must be 23 characters long and contain only 0s and 1s.");
+                throw new ArgumentException($"newMantissaBits must be 23 characters long and contain only 0s and 1s. Instead newMantissaBits={newMantissaBits}");
             }
 
             int floatBits = BitConverter.ToInt32(BitConverter.GetBytes(input), 0);
@@ -58,6 +58,17 @@ namespace osu.Game.Rulesets.Osu.Mods.CipherHelpers
             string lastMantissaBits = Convert.ToString(lastBits, 2).PadLeft(n, '0');
 
             return lastMantissaBits;
+        }
+
+        public static char GetNthMantissaBit(ref string mantissaBits, int position)
+        {
+            if (position is < 0 or > 22)
+            {
+                throw new ArgumentException("position must be between 0 and 22.");
+            }
+
+            char[] bits = mantissaBits.ToCharArray();
+            return bits[22 - position];
         }
 
         public static void SetNthMantissaBit(ref string mantissaBits, int position, char bit)
