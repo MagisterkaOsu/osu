@@ -31,6 +31,8 @@ namespace osu.Game.Rulesets.Osu.Configuration
 
             SetDefault(OsuRulesetSetting.ReplayPlayerX, "0");
             SetDefault(OsuRulesetSetting.ReplayPlayerY, "0");
+            SetDefault(OsuRulesetSetting.ReplayPlayerXBinary, "0b0");
+            SetDefault(OsuRulesetSetting.ReplayPlayerYBinary, "0b0");
         }
     }
 
@@ -52,5 +54,7 @@ namespace osu.Game.Rulesets.Osu.Configuration
         //Cipher
         ReplayPlayerX,
         ReplayPlayerY,
+        ReplayPlayerXBinary,
+        ReplayPlayerYBinary
     }
 }

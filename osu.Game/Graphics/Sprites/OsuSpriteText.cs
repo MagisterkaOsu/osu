@@ -19,5 +19,11 @@ namespace osu.Game.Graphics.Sprites
             Shadow = true;
             Font = OsuFont.Default;
         }
+
+        public OsuSpriteText(FontUsage usage)
+        {
+            Shadow = true;
+            Font = usage;
+        }
     }
 }

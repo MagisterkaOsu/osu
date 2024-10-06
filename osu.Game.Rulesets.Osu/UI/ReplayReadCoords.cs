@@ -19,7 +19,9 @@ namespace osu.Game.Rulesets.Osu.UI
     public partial class ReplayReadCoords : CompositeDrawable
     {
         private Bindable<string> replayPlayerX { get; set; } = new Bindable<string>("0");
+        private Bindable<string> replayPlayerXBinary { get; set; } = new Bindable<string>("0b0");
         private Bindable<string> replayPlayerY { get; set; } = new Bindable<string>("0");
+        private Bindable<string> replayPlayerYBinary { get; set; } = new Bindable<string>("0b0");
 
         private readonly List<OsuReplayFrame> replayFrames;
         private int currentFrame = -1;
@@ -35,7 +37,9 @@ namespace osu.Game.Rulesets.Osu.UI
         private void load(OsuRulesetConfigManager config)
         {
             config.BindWith(OsuRulesetSetting.ReplayPlayerX, replayPlayerX);
+            config.BindWith(OsuRulesetSetting.ReplayPlayerXBinary, replayPlayerXBinary);
             config.BindWith(OsuRulesetSetting.ReplayPlayerY, replayPlayerY);
+            config.BindWith(OsuRulesetSetting.ReplayPlayerYBinary, replayPlayerYBinary);
         }
 
         // protected override void LoadComplete()
@@ -74,7 +78,15 @@ namespace osu.Game.Rulesets.Osu.UI
                 Vector2 position = replayFrames[currentFrame].Position;
                 replayPlayerX.Value = position.X.ToString(CultureInfo.InvariantCulture);
                 replayPlayerY.Value = position.Y.ToString(CultureInfo.InvariantCulture);
+                replayPlayerXBinary.Value = getBitRepresentationOfPosition(position.X);
+                replayPlayerYBinary.Value = getBitRepresentationOfPosition(position.Y);
             }
+        }
+
+        private static string getBitRepresentationOfPosition(float position)
+        {
+            string bitRepresentation = Convert.ToString(BitConverter.SingleToInt32Bits(position), 2).PadLeft(32, '0');
+            return $"0b{bitRepresentation}";
         }
     }
 }
