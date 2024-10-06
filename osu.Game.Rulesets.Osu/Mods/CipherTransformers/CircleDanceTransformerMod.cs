@@ -2,11 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Overlays.Settings;
+using osu.Game.Rulesets.Replays;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Mods.CipherTransformers
@@ -43,6 +45,11 @@ namespace osu.Game.Rulesets.Osu.Mods.CipherTransformers
             float x = (float)(CircleRadius.Value * Math.Cos(arc));
             float y = (float)(CircleRadius.Value * Math.Sin(arc));
             return mousePosition + new Vector2(x, y);
+        }
+
+        public override string Decode(List<ReplayFrame> frames)
+        {
+            return "test";
         }
     }
 }
