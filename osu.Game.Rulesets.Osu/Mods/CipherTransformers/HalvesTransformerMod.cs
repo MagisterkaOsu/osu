@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Osu.Mods.CipherTransformers
 
         public override IconUsage? Icon => FontAwesome.Solid.StarHalf;
 
-        public override Vector2 Transform(Vector2 mousePosition)
+        public override Vector2 Transform(Vector2 mousePosition, bool pressedActions)
         {
             if (!Plaintext.AreBitsLeft()) return mousePosition;
 

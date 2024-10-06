@@ -159,7 +159,8 @@ namespace osu.Game.Rulesets.Osu
                     return new Mod[]
                     {
                         new CircleDanceTransformerMod(),
-                        new HalvesTransformerMod()
+                        new HalvesTransformerMod(),
+                        new BitEncoderTransformerMod()
                     };
 
                 case ModType.DifficultyReduction:

@@ -60,6 +60,48 @@ namespace osu.Game.Rulesets.Osu.Mods.CipherHelpers
             return lastMantissaBits;
         }
 
+        public static void SetNthMantissaBit(ref string mantissaBits, int position, char bit)
+        {
+            if (position is < 0 or > 22)
+            {
+                throw new ArgumentException("position must be between 0 and 22.");
+            }
+
+            if (bit != '0' && bit != '1')
+            {
+                throw new ArgumentException("bit must be either '0' or '1'.");
+            }
+
+            char[] bits = mantissaBits.ToCharArray();
+            bits[22 - position] = bit;
+            mantissaBits = new string(bits);
+        }
+
+        public static void SetMantissaBitsWithMask(ref string mantissaBits, int mask, string bitsMessage)
+        {
+            int maskBits = Convert.ToString(mask, 2).Replace("0", "").Length;
+
+            if (maskBits != bitsMessage.Length)
+            {
+                throw new ArgumentException("Amount of 1s in mask must be equal to the length of bitsMessage.");
+            }
+
+            char[] bits = mantissaBits.ToCharArray();
+            char[] bitsToSet = bitsMessage.ToCharArray();
+            int maskIndex = 0;
+
+            for (int i = 0; i < bits.Length; i++)
+            {
+                if ((mask & (1 << i)) != 0)
+                {
+                    bits[22 - i] = bitsToSet[bitsMessage.Length - maskIndex - 1];
+                    maskIndex++;
+                }
+            }
+
+            mantissaBits = new string(bits);
+        }
+
         public static string GetFloatBits(float input)
         {
             int floatBits = BitConverter.ToInt32(BitConverter.GetBytes(input), 0);

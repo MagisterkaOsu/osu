@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Osu.Mods.CipherTransformers
 
         private double arc;
 
-        public override Vector2 Transform(Vector2 mousePosition)
+        public override Vector2 Transform(Vector2 mousePosition, bool pressedActions)
         {
             arc += Speed.Value;
             float x = (float)(CircleRadius.Value * Math.Cos(arc));
