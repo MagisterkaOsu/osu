@@ -12,6 +12,8 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Configuration;
+using osu.Game.Rulesets.Osu.Mods.CipherHelpers;
+using osu.Game.Rulesets.Osu.Mods.CipherTransformers;
 using osu.Game.Rulesets.Osu.Replays;
 using osuTK;
 
@@ -51,10 +53,27 @@ namespace osu.Game.Rulesets.Osu.UI
 
         protected override void LoadComplete()
         {
-            // pass replay to decoder to set decodedString value
-            foreach (var mod in mods.OfType<IDecodesReplay>())
+            tryDecodeReplay();
+        }
+
+        private void tryDecodeReplay()
+        {
+            var firstFrame = replayFrames.FirstOrDefault();
+            if (firstFrame == null) return;
+
+            string xBits = FloatHelper.GetFloatBits(firstFrame.Position.X);
+            string yBits = FloatHelper.GetFloatBits(firstFrame.Position.Y);
+            string frameKey = xBits + yBits;
+
+            switch (frameKey)
             {
-                if (mod.DecodedString != null) decodedString.Value = mod.DecodedString.Invoke(replay.Frames);
+                case BitEncoderTransformerMod.FirstFrameKey:
+                    decodedString.Value = new BitEncoderTransformerMod().DecodedString.Invoke(replay.Frames);
+                    break;
+
+                default:
+                    decodedString.Value = new BitEncoderTransformerMod().DecodedString.Invoke(replay.Frames);
+                    break;
             }
         }
 
