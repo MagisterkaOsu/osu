@@ -311,7 +311,7 @@ namespace osu.Game.Scoring
             {
                 clearAllMods();
                 mods = value;
-                updateModsJson();
+                UpdateModsJson();
             }
         }
 
@@ -339,7 +339,7 @@ namespace osu.Game.Scoring
             {
                 clearAllMods();
                 apiMods = value;
-                updateModsJson();
+                UpdateModsJson();
             }
         }
 
@@ -350,7 +350,12 @@ namespace osu.Game.Scoring
             apiMods = null;
         }
 
-        private void updateModsJson()
+        public void RemoveModFromAPIMods(string mod)
+        {
+            APIMods = APIMods.Where(m => m.Acronym != mod).ToArray();
+        }
+
+        public void UpdateModsJson()
         {
             ModsJson = APIMods.Length > 0
                 ? JsonConvert.SerializeObject(APIMods)
