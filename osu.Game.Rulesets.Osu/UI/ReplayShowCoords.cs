@@ -16,6 +16,12 @@ namespace osu.Game.Rulesets.Osu.UI
 
         // BindableNumber<float> creates a slider, but SettingsNumberBox only accepts an int. That's why a textBox needs to be used.
 
+        [SettingSource("Decoded string", SettingControlType = typeof(SettingsSpriteText))]
+        public Bindable<string> DecodedString { get; } = new Bindable<string>
+        {
+            Default = string.Empty,
+        };
+
         [SettingSource("X (float)", SettingControlType = typeof(SettingsSpriteText))]
         public Bindable<string> ReplayPlayerX { get; } = new Bindable<string>
         {
@@ -51,12 +57,11 @@ namespace osu.Game.Rulesets.Osu.UI
         {
             AddRange(this.CreateSettingsControls());
 
+            config.BindWith(OsuRulesetSetting.DecodedString, DecodedString);
             config.BindWith(OsuRulesetSetting.ReplayPlayerX, ReplayPlayerX);
             config.BindWith(OsuRulesetSetting.ReplayPlayerY, ReplayPlayerY);
             config.BindWith(OsuRulesetSetting.ReplayPlayerXBinary, ReplayPlayerXBinary);
             config.BindWith(OsuRulesetSetting.ReplayPlayerYBinary, ReplayPlayerYBinary);
-
-
         }
     }
 }
