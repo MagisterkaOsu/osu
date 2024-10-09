@@ -112,7 +112,7 @@ namespace osu.Game.Scoring.Legacy
 
                 byte[] compressedScoreInfo = null;
 
-                if (version >= 30000001)
+                if (version >= 30000001 && sr.RemainingBytes > 0)
                     compressedScoreInfo = sr.ReadByteArray();
 
                 if (compressedReplay?.Length > 0)
