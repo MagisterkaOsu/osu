@@ -26,6 +26,8 @@ namespace osu.Game.Rulesets.Osu.Mods.CipherTransformers
         [SettingSource("Mask", "Message mask", SettingControlType = typeof(SettingsNumberBox))]
         public Bindable<int?> Mask { get; } = new Bindable<int?>(0);
 
+        public const string FirstFrameKey = "0011101110101110000010110100000001100010010001101110110101011011";
+
         private bool wroteFirstFrame;
         private Random random = new Random();
 
@@ -105,7 +107,7 @@ namespace osu.Game.Rulesets.Osu.Mods.CipherTransformers
         public override string Decode(List<ReplayFrame> frames)
         {
             List<OsuReplayFrame> replayFrames = frames.Cast<OsuReplayFrame>().ToList();
-            return "";
+            return "Bit Encoder Decode Result";
         }
 
         #endregion
