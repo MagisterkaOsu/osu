@@ -17,5 +17,18 @@ namespace osu.Game.Rulesets.Osu.Mods.CipherHelpers
 
             return count;
         }
+
+        public static int ParseBitString(string bitString)
+        {
+            int result = 0;
+
+            for (int i = 0; i < bitString.Length; i++)
+            {
+                result <<= 1;
+                result |= bitString[i] == '1' ? 1 : 0;
+            }
+
+            return result;
+        }
     }
 }
