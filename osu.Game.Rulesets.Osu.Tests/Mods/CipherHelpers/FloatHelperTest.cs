@@ -134,5 +134,16 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods.CipherHelpers
             FloatHelper.SetMantissaBitsWithMask(ref mantissaBits, mask, bits_to_set);
             Assert.AreEqual("00000000000000000100010", mantissaBits);
         }
+
+        [Test]
+        public void TestGetMantissaBitsWithMask()
+        {
+            const int mask = 0b0101010101;
+            string input = "00000000000001100110011";
+            const string expected_output = "10101";
+            string output = FloatHelper.GetMantissaBitsWithMask(ref input, mask);
+
+            Assert.AreEqual(expected_output, output);
+        }
     }
 }

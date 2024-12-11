@@ -44,6 +44,18 @@ namespace osu.Game.Rulesets.Osu.Mods.CipherHelpers
             input = BitConverter.ToSingle(BitConverter.GetBytes(floatBits), 0);
         }
 
+        public static void ReplaceBits(ref float input, string newBits)
+        {
+            if (newBits.Length != 32 || !System.Text.RegularExpressions.Regex.IsMatch(newBits, "^[01]+$"))
+            {
+                throw new ArgumentException($"newBits must be 32 characters long and contain only 0s and 1s. Instead newBits={newBits}");
+            }
+
+            int floatBits = BitConverter.ToInt32(BitConverter.GetBytes(input), 0);
+            int newFloatBits = Convert.ToInt32(newBits, 2);
+            input = BitConverter.ToSingle(BitConverter.GetBytes(newFloatBits), 0);
+        }
+
         public static string GetLastMantissaBits(float input, int n)
         {
             if (n is < 1 or > 23)
@@ -111,6 +123,24 @@ namespace osu.Game.Rulesets.Osu.Mods.CipherHelpers
             }
 
             mantissaBits = new string(bits);
+        }
+
+        public static string GetMantissaBitsWithMask(ref string mantissaBits, int mask)
+        {
+            char[] bits = mantissaBits.ToCharArray();
+            string output = String.Empty;
+            int maskIndex = 0;
+
+            for (int i = 0; i < bits.Length; i++)
+            {
+                if ((mask & (1 << i)) != 0)
+                {
+                    output = bits[22 - i] + output;
+                    maskIndex++;
+                }
+            }
+
+            return output;
         }
 
         public static string GetFloatBits(float input)
