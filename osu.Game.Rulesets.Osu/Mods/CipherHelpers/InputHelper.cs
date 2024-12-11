@@ -59,6 +59,11 @@ namespace osu.Game.Rulesets.Osu.Mods.CipherHelpers
             currentIndex = 0;
         }
 
+        public int GetLength()
+        {
+            return bitRepresentation.Length;
+        }
+
         public bool AreBitsLeft(int amount = 1)
         {
             return currentIndex + amount <= bitRepresentation.Length;

@@ -7,6 +7,7 @@ using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
+using osu.Framework.Logging;
 using osu.Game.Configuration;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Osu.Mods.CipherHelpers;
@@ -47,7 +48,7 @@ namespace osu.Game.Rulesets.Osu.Mods.CipherTransformers
                 transformSecondFrame(ref mousePosition);
                 wroteSecondFrame = true;
             }
-            else if (!pressedActions) transformNthFrame(ref mousePosition);
+            else if (!pressedActions) transformNthFrame(ref mousePosition, pressedActions);
 
             return mousePosition;
         }
@@ -66,7 +67,7 @@ namespace osu.Game.Rulesets.Osu.Mods.CipherTransformers
         private void transformSecondFrame(ref Vector2 mousePosition)
         {
             // Write data length to x
-            int plainTextLength = Plaintext.GetBits().Length;
+            int plainTextLength = Plaintext.GetLength();
             string plainTextLengthBinary = Convert.ToString(plainTextLength, 2).PadLeft(23, '0');
             FloatHelper.ReplaceMantissaBits(ref mousePosition.X, plainTextLengthBinary);
 
@@ -75,14 +76,14 @@ namespace osu.Game.Rulesets.Osu.Mods.CipherTransformers
             FloatHelper.ReplaceMantissaBits(ref mousePosition.Y, maskBinary);
         }
 
-        private void transformNthFrame(ref Vector2 mousePosition)
+        private void transformNthFrame(ref Vector2 mousePosition, bool pressedActions)
         {
             if (Mask.Value == null || Mask.Value == 0) return;
-            bool bitsLeftToEncode = Plaintext.GetBits().Length > 0;
+            bool bitsLeftToEncode = Plaintext.AreBitsLeft();
 
             if (bitsLeftToEncode)
             {
-                bool toEncode = random.Next(2) != 0;
+                bool toEncode = !pressedActions && random.Next(2) != 0;
 
                 if (toEncode)
                 {
@@ -102,14 +103,7 @@ namespace osu.Game.Rulesets.Osu.Mods.CipherTransformers
                     FloatHelper.ReplaceMantissaBits(ref mousePosition.X, xMantissaBits);
                 }
             }
-            else
-            {
-                string mantissaBits = FloatHelper.GetMantissaBits(mousePosition.X);
-                FloatHelper.SetNthMantissaBit(ref mantissaBits, 0, '0');
-                FloatHelper.ReplaceMantissaBits(ref mousePosition.X, mantissaBits);
-            }
         }
-
         #endregion
 
         #region Decode
