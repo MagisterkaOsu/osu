@@ -46,6 +46,17 @@ namespace osu.Game.Overlays.Settings
 
             valueText.Colour = Colour4.White;
             valueText.Current.BindTo(Current);
+            valueText.Current.BindValueChanged(curr =>
+            {
+                if (curr.NewValue == "<no message>")
+                {
+                    valueText.Colour = Colour4.MediumVioletRed;
+                }
+                else
+                {
+                    valueText.Colour = Colour4.White;
+                }
+            });
         }
 
         private readonly SpriteText labelText;

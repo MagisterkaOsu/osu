@@ -72,7 +72,7 @@ namespace osu.Game.Rulesets.Osu.UI
                     break;
 
                 default:
-                    decodedString.Value = new BitEncoderTransformerMod().DecodedString.Invoke(replay.Frames);
+                    decodedString.Value = new EmptyTransformerMod().DecodedString.Invoke(replay.Frames);
                     break;
             }
         }
