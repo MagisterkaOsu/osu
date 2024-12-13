@@ -20,56 +20,91 @@ namespace osu.Game.Rulesets.Osu.Mods.CipherTransformers
     {
         public override string Name => "Bit Encoder";
         public override string Acronym => "BE";
-        public override LocalisableString Description => "Encodes data into mantissa bits";
-        public override IconUsage? Icon => FontAwesome.Solid.QuestionCircle;
+        public override LocalisableString Description => "Puts data in mantissa bits of cursor";
+        public override IconUsage? Icon => FontAwesome.Solid.Columns;
 
         [SettingSource("Mask", "Message mask", SettingControlType = typeof(SettingsNumberBox))]
         public Bindable<int?> Mask { get; } = new Bindable<int?>(0);
 
-        public override string FirstFrameKey => "1011111110010111100111110111100010111111111100101010101100111110";
-        private bool wroteSecondFrame;
-        private readonly Random random = new Random();
+        public override string FirstFrameKey => BitEncoder.FIRST_FRAME_KEY;
 
-        #region Encode
+        private readonly BitEncoder encoder = new BitEncoder();
+        private readonly BitDecoder decoder = new BitDecoder();
 
         public override Vector2 Transform(Vector2 mousePosition, bool pressedActions)
         {
-            if (Mask.Value == null) return mousePosition;
+            return encoder.Encode(mousePosition, pressedActions, ref Plaintext, Mask.Value);
+        }
 
-            if (!WroteFirstFrame)
+        public override string Decode(List<ReplayFrame> frames)
+        {
+            foreach (var frame in frames.Cast<OsuReplayFrame>())
             {
-                TransformFirstFrame(ref mousePosition);
+                decoder.ProcessFrame(frame);
+            }
+
+            return decoder.GetDecodedMessage();
+        }
+    }
+
+    public class BitEncoder
+    {
+        public static readonly string FIRST_FRAME_KEY = "1011111110010111100111110111100010111111111100101010101100111110";
+
+        private bool wroteSecondFrame;
+        private bool wroteFirstFrame;
+        private readonly Random random = new Random();
+
+        public Vector2 Encode(Vector2 mousePosition, bool pressedActions, ref InputHelper input, int? mask)
+        {
+            if (mask == null) return mousePosition;
+
+            if (!wroteFirstFrame)
+            {
+                transformFirstFrame(ref mousePosition);
+                wroteFirstFrame = true;
                 return mousePosition;
             }
 
             if (!wroteSecondFrame)
             {
-                transformSecondFrame(ref mousePosition);
+                transformSecondFrame(ref mousePosition, ref input, mask.Value);
                 wroteSecondFrame = true;
                 return mousePosition;
             }
 
-            if (!pressedActions) transformNthFrame(ref mousePosition, pressedActions);
+            if (!pressedActions)
+                transformNthFrame(ref mousePosition, pressedActions, ref input, mask.Value);
+
             return mousePosition;
         }
 
-        private void transformSecondFrame(ref Vector2 mousePosition)
+        private void transformFirstFrame(ref Vector2 mousePosition)
         {
-            // Write data length to x
-            int plainTextLength = Plaintext.GetLength();
+            // Split FirstFrameKey into two parts
+            string xBits = FIRST_FRAME_KEY.Substring(0, 32);
+            string yBits = FIRST_FRAME_KEY.Substring(32, 32);
+
+            // Write the parts to the mantissas of X and Y
+            FloatHelper.ReplaceBits(ref mousePosition.X, xBits);
+            FloatHelper.ReplaceBits(ref mousePosition.Y, yBits);
+        }
+
+        private void transformSecondFrame(ref Vector2 mousePosition, ref InputHelper input, int mask)
+        {
+            int plainTextLength = input.GetLength();
             string plainTextLengthBinary = Convert.ToString(plainTextLength, 2).PadLeft(23, '0');
             FloatHelper.ReplaceMantissaBits(ref mousePosition.X, plainTextLengthBinary);
 
-            // Write mask to y
-            string maskBinary = Convert.ToString((int)Mask.Value!, 2).PadLeft(23, '0');
+            string maskBinary = Convert.ToString(mask, 2).PadLeft(23, '0');
             FloatHelper.ReplaceMantissaBits(ref mousePosition.Y, maskBinary);
         }
 
-        private void transformNthFrame(ref Vector2 mousePosition, bool pressedActions)
+        private void transformNthFrame(ref Vector2 mousePosition, bool pressedActions, ref InputHelper input, int mask)
         {
-            if (Mask.Value == null || Mask.Value == 0) return;
+            if (mask == 0) return;
 
-            bool bitsLeftToEncode = Plaintext.AreBitsLeft();
+            bool bitsLeftToEncode = input.AreBitsLeft();
 
             if (bitsLeftToEncode)
             {
@@ -80,10 +115,10 @@ namespace osu.Game.Rulesets.Osu.Mods.CipherTransformers
                     string xMantissaBits = FloatHelper.GetMantissaBits(mousePosition.X);
                     FloatHelper.SetNthMantissaBit(ref xMantissaBits, 0, '1');
                     FloatHelper.ReplaceMantissaBits(ref mousePosition.X, xMantissaBits);
-                    int mask1SAmount = IntHelper.GetAmountOf1SInMask((int)Mask.Value);
-                    string messageBits = Plaintext.GetBits(mask1SAmount);
+                    int mask1SAmount = IntHelper.GetAmountOf1SInMask(mask);
+                    string messageBits = input.GetBits(mask1SAmount);
                     string yMantissaBits = FloatHelper.GetMantissaBits(mousePosition.Y);
-                    FloatHelper.SetMantissaBitsWithMask(ref yMantissaBits, (int)Mask.Value, messageBits);
+                    FloatHelper.SetMantissaBitsWithMask(ref yMantissaBits, mask, messageBits);
                     FloatHelper.ReplaceMantissaBits(ref mousePosition.Y, yMantissaBits);
                 }
                 else
@@ -94,59 +129,51 @@ namespace osu.Game.Rulesets.Osu.Mods.CipherTransformers
                 }
             }
         }
+    }
 
-        #endregion
+    public class BitDecoder : IDecoder
+    {
+        private string readBits = string.Empty;
+        private int messageLength;
+        private int mask;
+        private int frameIndex;
 
-        #region Decode
-
-        public override string Decode(List<ReplayFrame> frames)
+        public void ProcessFrame(OsuReplayFrame frame)
         {
-            List<OsuReplayFrame> replayFrames = frames.Cast<OsuReplayFrame>().ToList();
-            string readBits = string.Empty;
-            int i = 0;
-            int messageLength = 0;
-            int mask = 0;
-
-            foreach (var frame in replayFrames)
+            if (frameIndex == 0)
             {
-                if (i == 0)
-                {
-                    i++;
-                    continue;
-                }
+                frameIndex++;
+                return;
+            }
 
-                if (i == 1)
-                {
-                    messageLength = IntHelper.ParseBitString(FloatHelper.GetMantissaBits(frame.Position.X));
-                    string maskString = FloatHelper.GetMantissaBits(frame.Position.Y);
-                    mask = IntHelper.ParseBitString(maskString);
-                    i++;
-                    continue;
-                }
+            if (frameIndex == 1)
+            {
+                messageLength = IntHelper.ParseBitString(FloatHelper.GetMantissaBits(frame.Position.X));
+                string maskString = FloatHelper.GetMantissaBits(frame.Position.Y);
+                mask = IntHelper.ParseBitString(maskString);
+                frameIndex++;
+                return;
+            }
 
+            if (readBits.Length < messageLength)
+            {
                 string xMantissaBits = FloatHelper.GetMantissaBits(frame.Position.X);
                 char xBit = FloatHelper.GetNthMantissaBit(ref xMantissaBits, 0);
-                bool toRead = readBits.Length < messageLength && xBit == '1';
 
-                if (toRead)
+                if (xBit == '1')
                 {
                     string yMantissaBits = FloatHelper.GetMantissaBits(frame.Position.Y);
                     string message = FloatHelper.GetMantissaBitsWithMask(ref yMantissaBits, mask);
                     readBits += message;
                 }
-                else
-                {
-                    if (readBits.Length == messageLength)
-                    {
-                        break;
-                    }
-                }
             }
 
-            string decodedMessage = StringHelper.ParseBitString(readBits);
-            return decodedMessage;
+            frameIndex++;
         }
 
-        #endregion
+        public string GetDecodedMessage()
+        {
+            return StringHelper.ParseBitString(readBits);
+        }
     }
 }

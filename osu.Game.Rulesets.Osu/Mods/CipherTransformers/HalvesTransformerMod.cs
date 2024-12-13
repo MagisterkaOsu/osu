@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Osu.Mods.CipherTransformers
         public override string Acronym => "HV";
         public override LocalisableString Description => ".5 - '1' ; .0 - '0'";
         public override IconUsage? Icon => FontAwesome.Solid.StarHalf;
-        public override string FirstFrameKey => HalvesEncoder.FirstFrameKey;
+        public override string FirstFrameKey => HalvesEncoder.FIRST_FRAME_KEY;
 
         private readonly HalvesEncoder encoder = new HalvesEncoder();
         private readonly HalvesDecoder decoder = new HalvesDecoder();
@@ -40,9 +40,9 @@ namespace osu.Game.Rulesets.Osu.Mods.CipherTransformers
         }
     }
 
-    public class HalvesEncoder : IEncoder
+    public class HalvesEncoder
     {
-        public static string FirstFrameKey = "1011111110010101100111110111100010111111111100101010101100101010";
+        public static readonly string FIRST_FRAME_KEY = "1011111110010101100111110111100010111111111100101010101100101010";
 
         private bool wroteFirstFrame;
         private bool wroteSecondFrame;
@@ -72,8 +72,8 @@ namespace osu.Game.Rulesets.Osu.Mods.CipherTransformers
         private void transformFirstFrame(ref Vector2 mousePosition)
         {
             // Split FirstFrameKey into two parts
-            string xBits = FirstFrameKey.Substring(0, 32);
-            string yBits = FirstFrameKey.Substring(32, 32);
+            string xBits = FIRST_FRAME_KEY.Substring(0, 32);
+            string yBits = FIRST_FRAME_KEY.Substring(32, 32);
 
             // Write the parts to the mantissas of X and Y
             FloatHelper.ReplaceBits(ref mousePosition.X, xBits);
@@ -107,7 +107,6 @@ namespace osu.Game.Rulesets.Osu.Mods.CipherTransformers
         private string readBits = string.Empty;
         private int messageLength;
         private int frameIndex;
-        private bool lengthDecoded;
 
         public void ProcessFrame(OsuReplayFrame frame)
         {
@@ -117,10 +116,10 @@ namespace osu.Game.Rulesets.Osu.Mods.CipherTransformers
                 return;
             }
 
-            if (!lengthDecoded)
+            if (frameIndex == 1)
             {
                 messageLength = IntHelper.ParseBitString(FloatHelper.GetMantissaBits(frame.Position.X));
-                lengthDecoded = true;
+                frameIndex++;
                 return;
             }
 

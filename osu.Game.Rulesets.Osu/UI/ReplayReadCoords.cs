@@ -65,22 +65,26 @@ namespace osu.Game.Rulesets.Osu.UI
             string yBits = FloatHelper.GetFloatBits(firstFrame.Position.Y);
             string frameKey = xBits + yBits;
 
-            var cipherModsInstances = new List<ModCipher>
+            var decoders = new Dictionary<string, IDecoder>
             {
-                new BitEncoderTransformerMod(),
-                new HalvesTransformerMod(),
+                { BitEncoder.FIRST_FRAME_KEY, new BitDecoder() },
+                { HalvesEncoder.FIRST_FRAME_KEY, new HalvesDecoder() }
             };
 
-            switch (frameKey)
-            {
-                case var key when cipherModsInstances.Any(instance => instance.FirstFrameKey == key):
-                    var matchingMod = cipherModsInstances.First(instance => instance.FirstFrameKey == frameKey);
-                    decodedString.Value = matchingMod.DecodedString?.Invoke(replay.Frames) ?? "<no value>";
-                    break;
+            var matchingDecoder = decoders[frameKey];
 
-                default:
-                    decodedString.Value = new EmptyTransformerMod().DecodedString?.Invoke(replay.Frames) ?? "<no value>";
-                    break;
+            if (matchingDecoder != null)
+            {
+                foreach (var frame in replayFrames.Cast<OsuReplayFrame>())
+                {
+                    matchingDecoder.ProcessFrame(frame);
+                }
+
+                decodedString.Value = matchingDecoder.GetDecodedMessage();
+            }
+            else
+            {
+                decodedString.Value = "<no value>";
             }
         }
 
