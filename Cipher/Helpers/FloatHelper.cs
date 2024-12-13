@@ -157,7 +157,7 @@ namespace Cipher.Helpers
 
         public static string GetFraction(ref float input)
         {
-            string[] parts = input.ToString().Split(".");
+            string[] parts = input.ToString().Contains(".") ? input.ToString().Split(".") : input.ToString().Split(",");
             if (parts.Length == 1) return "0";
             return parts[1];
         }
