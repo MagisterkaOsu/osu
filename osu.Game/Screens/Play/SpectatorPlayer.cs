@@ -122,8 +122,11 @@ namespace osu.Game.Screens.Play
                     string yBits = FloatHelper.GetFloatBits(frame.Position.Y);
                     string frameKey = xBits + yBits;
 
-                    var matchingDecoder = decoders[frameKey];
-                    decoder = matchingDecoder;
+                    if (decoders.TryGetValue(frameKey, out var value))
+                    {
+                        var matchingDecoder = value;
+                        decoder = matchingDecoder;
+                    }
                 }
 
                 score.Replay.Frames.Add(convertedFrame);
