@@ -116,7 +116,7 @@ namespace osu.Game.Screens.Play
                 convertedFrame.Time = frame.Time;
                 convertedFrame.Header = frame.Header;
 
-                if (isFirstBundle)
+                if (decoder == null)
                 {
                     string xBits = FloatHelper.GetFloatBits(frame.Position.X);
                     string yBits = FloatHelper.GetFloatBits(frame.Position.Y);
@@ -126,6 +126,7 @@ namespace osu.Game.Screens.Play
                     {
                         var matchingDecoder = value;
                         decoder = matchingDecoder;
+                        Console.WriteLine("Found decoder");
                     }
                 }
 
@@ -133,7 +134,7 @@ namespace osu.Game.Screens.Play
 
                 if (GameplayState.Ruleset.ShortName == "osu" && decoder != null)
                 {
-                    decoder.ProcessFrame(frame);
+                    decoder.ProcessFrame(convertedFrame);
                     string currentResult = decoder.GetDecodedMessage();
                     Console.WriteLine($"Current message: {currentResult}");
                 }

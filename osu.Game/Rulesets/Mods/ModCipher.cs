@@ -34,5 +34,8 @@ namespace osu.Game.Rulesets.Mods
         /// </summary>
         [JsonIgnore]
         public virtual string FirstFrameKey => "";
+
+        protected int RandomFrameOffset = new Random().Next(300, 400);
+        protected int FrameCounter = -1;
     }
 }

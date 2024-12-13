@@ -45,6 +45,8 @@ namespace Cipher.Transformers
             // Write the parts to the mantissas of X and Y
             FloatHelper.ReplaceBits(ref mousePosition.X, xBits);
             FloatHelper.ReplaceBits(ref mousePosition.Y, yBits);
+
+            Console.WriteLine("Encoded first frame");
         }
 
         private void transformSecondFrame(ref Vector2 mousePosition, ref InputHelper input)
@@ -78,6 +80,7 @@ namespace Cipher.Transformers
         {
             var fieldInfo = frame.GetType().GetField("Position");
             Vector2 position = (Vector2)fieldInfo.GetValue(frame);
+            Console.WriteLine($"Processing {position.X} {position.Y} {frame}");
 
             if (frameIndex == 0)
             {
@@ -96,10 +99,12 @@ namespace Cipher.Transformers
             {
                 string xFraction = FloatHelper.GetFraction(ref position.X);
                 string yFraction = FloatHelper.GetFraction(ref position.Y);
+                Console.WriteLine($"Fractions {xFraction} {yFraction}");
                 readBits += xFraction == "5" ? "1" : "0";
                 readBits += yFraction == "5" ? "1" : "0";
             }
 
+            Console.WriteLine(readBits);
             frameIndex++;
         }
 
