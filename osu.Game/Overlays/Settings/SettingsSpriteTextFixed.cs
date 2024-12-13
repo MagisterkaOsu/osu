@@ -13,9 +13,9 @@ using osuTK;
 
 namespace osu.Game.Overlays.Settings
 {
-    public partial class SettingsSpriteText : SettingsItem<string>
+    public partial class SettingsSpriteTextFixed : SettingsItem<string>
     {
-        public SettingsSpriteText()
+        public SettingsSpriteTextFixed()
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -28,7 +28,7 @@ namespace osu.Game.Overlays.Settings
                     Spacing = new Vector2(0, 5),
                     Direction = FillDirection.Vertical,
                     Padding = new MarginPadding { Left = SettingsPanel.CONTENT_MARGINS },
-                    Children = new Drawable[] { labelText = new OsuSpriteText(), valueText = new OsuSpriteText(OsuFont.Default.With(size: 16, weight: FontWeight.SemiBold)), }
+                    Children = new Drawable[] { labelText = new OsuSpriteText(), valueText = new OsuSpriteText(OsuFont.Default.With(size: 16, weight: FontWeight.SemiBold, fixedWidth:true)), }
                 }
             };
             labelText.Width = SettingsToolboxGroup.CONTAINER_WIDTH - SettingsPanel.CONTENT_MARGINS * 2;

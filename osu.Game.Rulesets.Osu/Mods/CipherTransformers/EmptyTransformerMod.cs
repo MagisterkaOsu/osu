@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Osu.Mods.CipherTransformers
 
         public override string Decode(List<ReplayFrame> frames)
         {
-            return "<no message>";
+            return "<no value>";
         }
     }
 }
