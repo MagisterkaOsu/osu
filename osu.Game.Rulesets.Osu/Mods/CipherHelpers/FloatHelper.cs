@@ -156,5 +156,12 @@ namespace osu.Game.Rulesets.Osu.Mods.CipherHelpers
             string[] parts = input.ToString().Split(".");
             input = float.Parse($"{parts[0]}.{newFraction}");
         }
+
+        public static string GetFraction(ref float input)
+        {
+            string[] parts = input.ToString().Split(".");
+            if (parts.Length == 1) return "0";
+            return parts[1];
+        }
     }
 }

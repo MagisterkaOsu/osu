@@ -7,7 +7,6 @@ using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
-using osu.Framework.Logging;
 using osu.Game.Configuration;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Osu.Mods.CipherHelpers;
@@ -27,10 +26,9 @@ namespace osu.Game.Rulesets.Osu.Mods.CipherTransformers
         [SettingSource("Mask", "Message mask", SettingControlType = typeof(SettingsNumberBox))]
         public Bindable<int?> Mask { get; } = new Bindable<int?>(0);
 
-        public const string FirstFrameKey = "1011111110010111100111110111100010111111111100101010101100111110";
-        private bool wroteFirstFrame;
+        public override string FirstFrameKey => "1011111110010111100111110111100010111111111100101010101100111110";
         private bool wroteSecondFrame;
-        private Random random = new Random();
+        private readonly Random random = new Random();
 
         #region Encode
 
@@ -38,30 +36,21 @@ namespace osu.Game.Rulesets.Osu.Mods.CipherTransformers
         {
             if (Mask.Value == null) return mousePosition;
 
-            if (!wroteFirstFrame)
+            if (!WroteFirstFrame)
             {
-                transformFirstFrame(ref mousePosition);
-                wroteFirstFrame = true;
+                TransformFirstFrame(ref mousePosition);
+                return mousePosition;
             }
-            else if (!wroteSecondFrame)
+
+            if (!wroteSecondFrame)
             {
                 transformSecondFrame(ref mousePosition);
                 wroteSecondFrame = true;
+                return mousePosition;
             }
-            else if (!pressedActions) transformNthFrame(ref mousePosition, pressedActions);
 
+            if (!pressedActions) transformNthFrame(ref mousePosition, pressedActions);
             return mousePosition;
-        }
-
-        private void transformFirstFrame(ref Vector2 mousePosition)
-        {
-            // Split FirstFrameKey into two parts
-            string xBits = FirstFrameKey.Substring(0, 32);
-            string yBits = FirstFrameKey.Substring(32, 32);
-
-            // Write the parts to the mantissas of X and Y
-            FloatHelper.ReplaceBits(ref mousePosition.X, xBits);
-            FloatHelper.ReplaceBits(ref mousePosition.Y, yBits);
         }
 
         private void transformSecondFrame(ref Vector2 mousePosition)
@@ -79,6 +68,7 @@ namespace osu.Game.Rulesets.Osu.Mods.CipherTransformers
         private void transformNthFrame(ref Vector2 mousePosition, bool pressedActions)
         {
             if (Mask.Value == null || Mask.Value == 0) return;
+
             bool bitsLeftToEncode = Plaintext.AreBitsLeft();
 
             if (bitsLeftToEncode)
@@ -104,6 +94,7 @@ namespace osu.Game.Rulesets.Osu.Mods.CipherTransformers
                 }
             }
         }
+
         #endregion
 
         #region Decode
@@ -112,7 +103,6 @@ namespace osu.Game.Rulesets.Osu.Mods.CipherTransformers
         {
             List<OsuReplayFrame> replayFrames = frames.Cast<OsuReplayFrame>().ToList();
             string readBits = string.Empty;
-            string decodedMessage = string.Empty;
             int i = 0;
             int messageLength = 0;
             int mask = 0;
@@ -153,7 +143,7 @@ namespace osu.Game.Rulesets.Osu.Mods.CipherTransformers
                 }
             }
 
-            decodedMessage = StringHelper.ParseBitString(readBits);
+            string decodedMessage = StringHelper.ParseBitString(readBits);
             return decodedMessage;
         }
 
