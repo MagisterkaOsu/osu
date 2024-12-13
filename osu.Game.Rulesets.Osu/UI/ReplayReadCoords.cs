@@ -5,6 +5,9 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using Cipher.Helpers;
+using Cipher.Interfaces;
+using Cipher.Transformers;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -12,8 +15,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Configuration;
-using osu.Game.Rulesets.Osu.Mods.CipherHelpers;
-using osu.Game.Rulesets.Osu.Mods.CipherTransformers;
 using osu.Game.Rulesets.Osu.Replays;
 using osuTK;
 

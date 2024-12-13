@@ -2,8 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using Cipher.Helpers;
 using NUnit.Framework;
-using osu.Game.Rulesets.Osu.Mods.CipherHelpers;
 using osu.Game.Rulesets.Osu.Mods.CipherTransformers;
 using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.Replays;

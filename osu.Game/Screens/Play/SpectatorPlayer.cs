@@ -104,6 +104,11 @@ namespace osu.Game.Screens.Play
                 convertedFrame.Header = frame.Header;
 
                 score.Replay.Frames.Add(convertedFrame);
+
+                if (GameplayState.Ruleset.ShortName == "osu")
+                {
+
+                }
             }
 
             if (isFirstBundle && score.Replay.Frames.Count > 0)

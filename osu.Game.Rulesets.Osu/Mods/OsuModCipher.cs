@@ -3,10 +3,10 @@
 
 using System;
 using System.Collections.Generic;
+using Cipher.Helpers;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Osu.Mods.CipherHelpers;
 using osu.Game.Rulesets.Replays;
 using osuTK;
 

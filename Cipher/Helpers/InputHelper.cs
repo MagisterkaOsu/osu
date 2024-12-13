@@ -1,10 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
-using osu.Framework.Logging;
-
-namespace osu.Game.Rulesets.Osu.Mods.CipherHelpers
+namespace Cipher.Helpers
 {
     public class InputHelper
     {
@@ -26,7 +23,6 @@ namespace osu.Game.Rulesets.Osu.Mods.CipherHelpers
         {
             if (currentIndex >= bitRepresentation.Length)
             {
-                Logger.Log("Whole plaintext was read. Supplying '0's from now on.");
                 return '0';
             }
 
@@ -39,7 +35,6 @@ namespace osu.Game.Rulesets.Osu.Mods.CipherHelpers
 
             if (!AreBitsLeft(length))
             {
-                Logger.Log("Whole plaintext was read. Supplying '0's from now on.");
                 bitsToRead = bitRepresentation.Length - currentIndex;
             }
 

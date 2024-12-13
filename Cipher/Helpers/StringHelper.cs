@@ -1,7 +1,6 @@
-using System;
 using System.Text;
 
-namespace osu.Game.Rulesets.Osu.Mods.CipherHelpers
+namespace Cipher.Helpers
 {
     public class StringHelper
     {
