@@ -1,6 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Collections.Generic;
+using Cipher.Helpers;
+using Cipher.Interfaces;
+using Cipher.Transformers;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
@@ -81,6 +86,14 @@ namespace osu.Game.Screens.Play
             SpectatorClient.OnNewFrames += userSentFrames;
         }
 
+        private Dictionary<string, IDecoder> decoders = new Dictionary<string, IDecoder>
+        {
+            { BitEncoder.FIRST_FRAME_KEY, new BitDecoder() },
+            { HalvesEncoder.FIRST_FRAME_KEY, new HalvesDecoder() }
+        };
+
+        private IDecoder? decoder;
+
         private void userSentFrames(int userId, FrameDataBundle bundle)
         {
             if (userId != score.ScoreInfo.User.OnlineID)
@@ -103,11 +116,23 @@ namespace osu.Game.Screens.Play
                 convertedFrame.Time = frame.Time;
                 convertedFrame.Header = frame.Header;
 
+                if (isFirstBundle)
+                {
+                    string xBits = FloatHelper.GetFloatBits(frame.Position.X);
+                    string yBits = FloatHelper.GetFloatBits(frame.Position.Y);
+                    string frameKey = xBits + yBits;
+
+                    var matchingDecoder = decoders[frameKey];
+                    decoder = matchingDecoder;
+                }
+
                 score.Replay.Frames.Add(convertedFrame);
 
-                if (GameplayState.Ruleset.ShortName == "osu")
+                if (GameplayState.Ruleset.ShortName == "osu" && decoder != null)
                 {
-
+                    decoder.ProcessFrame(frame);
+                    string currentResult = decoder.GetDecodedMessage();
+                    Console.WriteLine($"Current message: {currentResult}");
                 }
             }
 
