@@ -11,9 +11,12 @@ namespace osu.Game.Rulesets.Osu.Mods.CipherHelpers
 
             for (int i = 0; i < bitString.Length; i += 8)
             {
-                string byteString = bitString.Substring(i, 8);
-                char character = (char)Convert.ToInt32(byteString, 2);
-                result.Append(character);
+                if (bitString.Length >= i + 7)
+                {
+                    string byteString = bitString.Substring(i, 8);
+                    char character = (char)Convert.ToInt32(byteString, 2);
+                    result.Append(character);
+                }
             }
 
             return result.ToString();
