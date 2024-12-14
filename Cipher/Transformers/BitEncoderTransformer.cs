@@ -133,5 +133,10 @@ namespace Cipher.Transformers
         {
             return StringHelper.ParseBitString(readBits);
         }
+
+        public IDecoder Clone()
+        {
+            return (BitDecoder)MemberwiseClone();
+        }
     }
 }

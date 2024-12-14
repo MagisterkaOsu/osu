@@ -16,5 +16,7 @@ namespace Cipher.Interfaces
         /// </summary>
         /// <returns>The decoded message as a string.</returns>
         string GetDecodedMessage();
+
+        public IDecoder Clone();
     }
 }

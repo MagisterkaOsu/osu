@@ -80,17 +80,25 @@ namespace Cipher.Transformers
         {
             var fieldInfo = frame.GetType().GetField("Position");
             Vector2 position = (Vector2)fieldInfo.GetValue(frame);
-            Console.WriteLine($"Processing {position.X} {position.Y} {frame}");
 
             if (frameIndex == 0)
             {
-                frameIndex++;
+                string xBits = FloatHelper.GetFloatBits(position.X);
+                string yBits = FloatHelper.GetFloatBits(position.Y);
+                string frameKey = xBits + yBits;
+
+                if (frameKey == HalvesEncoder.FIRST_FRAME_KEY)
+                {
+                    frameIndex++;
+                }
+
                 return;
             }
 
             if (frameIndex == 1)
             {
                 messageLength = IntHelper.ParseBitString(FloatHelper.GetMantissaBits(position.X));
+                Console.WriteLine($"Message length={messageLength}");
                 frameIndex++;
                 return;
             }
@@ -99,18 +107,21 @@ namespace Cipher.Transformers
             {
                 string xFraction = FloatHelper.GetFraction(ref position.X);
                 string yFraction = FloatHelper.GetFraction(ref position.Y);
-                Console.WriteLine($"Fractions {xFraction} {yFraction}");
                 readBits += xFraction == "5" ? "1" : "0";
                 readBits += yFraction == "5" ? "1" : "0";
             }
 
-            Console.WriteLine(readBits);
             frameIndex++;
         }
 
         public string GetDecodedMessage()
         {
             return StringHelper.ParseBitString(readBits);
+        }
+
+        public IDecoder Clone()
+        {
+            return (HalvesDecoder)MemberwiseClone();
         }
     }
 }
