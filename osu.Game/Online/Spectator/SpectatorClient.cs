@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Cipher.Interfaces;
+using Cipher.Transformers;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Development;
@@ -162,12 +164,48 @@ namespace osu.Game.Online.Spectator
             return Task.CompletedTask;
         }
 
+        private Dictionary<string, IDecoder> decoders = new Dictionary<string, IDecoder>
+        {
+            { BitEncoder.FIRST_FRAME_KEY, new BitDecoder() },
+            { HalvesEncoder.FIRST_FRAME_KEY, new HalvesDecoder() }
+        };
+
+        private IDecoder? decoder;
+
         Task ISpectatorClient.UserSentFrames(int userId, FrameDataBundle data)
         {
             if (data.Frames.Count > 0)
                 data.Frames[^1].Header = data.Header;
 
             Schedule(() => OnNewFrames?.Invoke(userId, data));
+
+            // foreach (var frame in data.Frames)
+            // {
+            //     if (decoder == null)
+            //     {
+            //         string xBits = FloatHelper.GetFloatBits(frame.Position.X);
+            //         string yBits = FloatHelper.GetFloatBits(frame.Position.Y);
+            //         string frameKey = xBits + yBits;
+            //
+            //         if (decoders.TryGetValue(frameKey, out var value))
+            //         {
+            //             var matchingDecoder = value;
+            //             decoder = matchingDecoder;
+            //             Console.WriteLine("Found decoder");
+            //         }
+            //     }
+            //
+            //     if (decoder != null)
+            //     {
+            //         IConvertibleReplayFrame convertibleFrame = GameplayState.Ruleset.CreateConvertibleReplayFrame()!;
+            //         convertibleFrame.FromLegacy(frame, GameplayState.Beatmap);
+            //
+            //         decoder.ProcessFrame(convertedFrame);
+            //         string currentResult = decoder.GetDecodedMessage();
+            //         Console.WriteLine($"Current message: {currentResult}");
+            //     }
+            // }
+
 
             return Task.CompletedTask;
         }

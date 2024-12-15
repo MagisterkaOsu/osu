@@ -4,10 +4,10 @@
 using System.Collections.Generic;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
-using osu.Game.Rulesets.Osu.Mods.CipherHelpers;
 using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.Replays;
 using System.Linq;
+using Cipher.Transformers;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Mods.CipherTransformers
@@ -17,33 +17,26 @@ namespace osu.Game.Rulesets.Osu.Mods.CipherTransformers
         public override string Name => "Halves";
         public override string Acronym => "HV";
         public override LocalisableString Description => ".5 - '1' ; .0 - '0'";
-
         public override IconUsage? Icon => FontAwesome.Solid.StarHalf;
+        public override string FirstFrameKey => HalvesEncoder.FIRST_FRAME_KEY;
+
+        private readonly HalvesEncoder encoder = new HalvesEncoder();
+        private readonly HalvesDecoder decoder = new HalvesDecoder();
 
         public override Vector2 Transform(Vector2 mousePosition, bool pressedActions)
         {
-            if (!Plaintext.AreBitsLeft()) return mousePosition;
-
-            char xBit = Plaintext.GetBit();
-            char yBit = Plaintext.GetBit();
-
-            Vector2 result = mousePosition;
-            if (xBit == '1')
-                FloatHelper.ReplaceFraction(ref result.X, "5");
-            else
-                FloatHelper.ReplaceFraction(ref result.X, "0");
-
-            if (yBit == '1')
-                FloatHelper.ReplaceFraction(ref result.Y, "5");
-            else
-                FloatHelper.ReplaceFraction(ref result.Y, "0");
-            return result;
+            FrameCounter++;
+            return FrameCounter > RandomFrameOffset ? encoder.Encode(mousePosition, pressedActions, ref Plaintext) : mousePosition;
         }
 
         public override string Decode(List<ReplayFrame> frames)
         {
-            List<OsuReplayFrame> replayFrames = frames.Cast<OsuReplayFrame>().ToList();
-            return "";
+            foreach (var frame in frames.Cast<OsuReplayFrame>())
+            {
+                decoder.ProcessFrame(frame);
+            }
+
+            return decoder.GetDecodedMessage();
         }
     }
 }
