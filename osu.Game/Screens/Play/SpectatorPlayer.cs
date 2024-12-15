@@ -174,6 +174,7 @@ namespace osu.Game.Screens.Play
             if (SpectatorClient.IsNotNull())
             {
                 SpectatorClient.OnNewFrames -= userSentFrames;
+                SpectatorClient.OnNewFrames -= tryFindDecoder;
                 SpectatorClient.OnNewFrames -= readReplayFrames;
             }
         }
