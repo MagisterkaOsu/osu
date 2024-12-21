@@ -72,9 +72,7 @@ namespace osu.Game.Rulesets.Osu.UI
                 { HalvesEncoder.FIRST_FRAME_KEY, new HalvesDecoder() }
             };
 
-            var matchingDecoder = decoders[frameKey];
-
-            if (matchingDecoder != null)
+            if (decoders.TryGetValue(frameKey, out var matchingDecoder))
             {
                 foreach (var frame in replayFrames.Cast<OsuReplayFrame>())
                 {
