@@ -101,9 +101,9 @@ namespace osu.Game.Screens.Play
         private IDecoder? decoder;
 
         /// <summary>
-        /// Helper for reading from a queue of frames.
+        /// Queue for frames to be later decoding when decoder is found.
         /// </summary>
-        private readonly FrameHelper.FrameListReader frameListReader = new FrameHelper.FrameListReader();
+        private readonly Queue<object> decodingQueue = new Queue<object>();
 
         /// <summary>
         /// Token source for cancelling the decoding task.
@@ -149,9 +149,8 @@ namespace osu.Game.Screens.Play
             {
                 while (!token.IsCancellationRequested)
                 {
-                    if (frameListReader.HasNext())
+                    if (decodingQueue.TryDequeue(out object frame))
                     {
-                        object frame = frameListReader.ReadFrame();
                         decoder.ProcessFrame(frame);
                     }
                     else
@@ -183,7 +182,7 @@ namespace osu.Game.Screens.Play
                 convertedFrame.Time = frame.Time;
                 convertedFrame.Header = frame.Header;
                 score.Replay.Frames.Add(convertedFrame);
-                frameListReader.AddFrame(convertedFrame);
+                decodingQueue.Enqueue(convertedFrame);
             }
 
             if (isFirstBundle && score.Replay.Frames.Count > 0) SetGameplayStartTime(score.Replay.Frames[0].Time);
@@ -211,6 +210,7 @@ namespace osu.Game.Screens.Play
             {
                 SpectatorClient.OnNewFrames -= userSentFrames;
                 SpectatorClient.OnNewFrames -= tryFindDecoder;
+                decodingQueue.Clear();
                 cts.Cancel();
             }
         }
