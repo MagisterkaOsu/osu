@@ -32,7 +32,7 @@ namespace Cipher.Transformers
                 return mousePosition;
             }
 
-            if (!pressedActions) transformNthFrame(ref mousePosition, pressedActions, ref input, mask.Value);
+            transformNthFrame(ref mousePosition, pressedActions, ref input, mask.Value);
             return mousePosition;
         }
 
@@ -63,6 +63,9 @@ namespace Cipher.Transformers
 
             if (bitsLeftToEncode)
             {
+                string mantissaBits = FloatHelper.GetMantissaBits(mousePosition.X);
+                FloatHelper.SetNthMantissaBit(ref mantissaBits, 0, '0');
+                FloatHelper.ReplaceMantissaBits(ref mousePosition.X, mantissaBits);
                 bool toEncode = !pressedActions && random.Next(2) != 0;
 
                 if (toEncode)
@@ -75,12 +78,6 @@ namespace Cipher.Transformers
                     string yMantissaBits = FloatHelper.GetMantissaBits(mousePosition.Y);
                     FloatHelper.SetMantissaBitsWithMask(ref yMantissaBits, mask, messageBits);
                     FloatHelper.ReplaceMantissaBits(ref mousePosition.Y, yMantissaBits);
-                }
-                else
-                {
-                    string xMantissaBits = FloatHelper.GetMantissaBits(mousePosition.X);
-                    FloatHelper.SetNthMantissaBit(ref xMantissaBits, 0, '0');
-                    FloatHelper.ReplaceMantissaBits(ref mousePosition.X, xMantissaBits);
                 }
             }
         }
