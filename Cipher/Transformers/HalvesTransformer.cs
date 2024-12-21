@@ -13,6 +13,8 @@ namespace Cipher.Transformers
     public class HalvesEncoder
     {
         public static readonly string FIRST_FRAME_KEY = "1011111110010101100111110111100010111111111100101010101100101010";
+        public static readonly string[] ZERO_FRACTIONS = { "0" };
+        public static readonly string[] ONE_FRACTIONS = { "5" };
         private bool wroteFirstFrame;
         private bool wroteSecondFrame;
 
@@ -32,7 +34,7 @@ namespace Cipher.Transformers
                 return mousePosition;
             }
 
-            if (!pressedActions) transformNthFrame(ref mousePosition, ref input);
+            transformNthFrame(ref mousePosition, ref input);
             return mousePosition;
         }
 

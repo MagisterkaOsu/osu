@@ -69,7 +69,8 @@ namespace osu.Game.Rulesets.Osu.UI
             var decoders = new Dictionary<string, IDecoder>
             {
                 { BitEncoder.FIRST_FRAME_KEY, new BitDecoder() },
-                { HalvesEncoder.FIRST_FRAME_KEY, new HalvesDecoder() }
+                { HalvesEncoder.FIRST_FRAME_KEY, new HalvesDecoder() },
+                { NetworkTestEncoder.FIRST_FRAME_KEY, new NetworkTestDecoder() }
             };
 
             if (decoders.TryGetValue(frameKey, out var matchingDecoder))

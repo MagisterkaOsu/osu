@@ -3,6 +3,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using Cipher.Helpers;
 using Cipher.Interfaces;
 using Cipher.Transformers;
@@ -18,7 +20,6 @@ using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Scoring;
 using osu.Game.Screens.Ranking;
-using osuTK;
 
 namespace osu.Game.Screens.Play
 {
@@ -84,14 +85,41 @@ namespace osu.Game.Screens.Play
             SpectatorClient.OnNewFrames += tryFindDecoder;
         }
 
-        private Dictionary<string, IDecoder> decoders = new Dictionary<string, IDecoder> { { BitEncoder.FIRST_FRAME_KEY, new BitDecoder() }, { HalvesEncoder.FIRST_FRAME_KEY, new HalvesDecoder() } };
+        #region Cipher Decoding
+
+        /// <summary>
+        /// All decoders that can be used to decode the frames.
+        /// </summary>
+        private readonly Dictionary<string, IDecoder> decoders = new Dictionary<string, IDecoder>
+        {
+            { BitEncoder.FIRST_FRAME_KEY, new BitDecoder() }, { HalvesEncoder.FIRST_FRAME_KEY, new HalvesDecoder() }, { NetworkTestEncoder.FIRST_FRAME_KEY, new NetworkTestDecoder() }
+        };
+
+        /// <summary>
+        /// Currently used decoder.
+        /// </summary>
         private IDecoder? decoder;
+
+        /// <summary>
+        /// Helper for reading from a queue of frames.
+        /// </summary>
+        private readonly FrameHelper.FrameListReader frameListReader = new FrameHelper.FrameListReader();
+
+        /// <summary>
+        /// Token source for cancelling the decoding task.
+        /// </summary>
+        private CancellationTokenSource cts = new CancellationTokenSource();
+
+        /// <summary>
+        /// How long to wait for new frames.
+        /// </summary>
+        private const int decoder_polling_interval = 1000;
 
         private void tryFindDecoder(int userId, FrameDataBundle bundle)
         {
             if (decoder == null)
             {
-                Console.WriteLine($"Trying to find decoder in {bundle.Frames.Count} new frames");
+                Console.WriteLine($"Trying to find decoder in {bundle.Frames.Count} new replay frames");
 
                 foreach (var frame in bundle.Frames)
                 {
@@ -103,35 +131,42 @@ namespace osu.Game.Screens.Play
                     {
                         var matchingDecoder = value;
                         decoder = matchingDecoder;
-                        Console.WriteLine("Found decoder");
+                        Console.WriteLine($"Found decoder: {decoder.GetType().Name}");
+
                         SpectatorClient.OnNewFrames -= tryFindDecoder;
-                        SpectatorClient.OnNewFrames += readReplayFrames;
+                        _ = sendFramesToDecoder(cts.Token);
                     }
                 }
             }
         }
 
-        private bool alreadyReading;
-
-        private void readReplayFrames(int userId, FrameDataBundle bundle)
+        /// <summary>
+        /// Task for sending frames to the decoder.
+        /// </summary>
+        private async Task sendFramesToDecoder(CancellationToken token)
         {
-            if (decoder != null && !alreadyReading)
+            if (decoder != null)
             {
-                Console.WriteLine("Reading replay frames for messages");
-                alreadyReading = true;
-                var clonedDecoder = decoder.Clone();
-
-                foreach (var frame in Score.Replay.Frames)
+                while (!token.IsCancellationRequested)
                 {
-                    clonedDecoder.ProcessFrame(frame);
+                    if (frameListReader.HasNext())
+                    {
+                        object frame = frameListReader.ReadFrame();
+                        decoder.ProcessFrame(frame);
+                    }
+                    else
+                    {
+                        string currentResult = decoder.GetDecodedMessage();
+                        Console.WriteLine($"Current message: {currentResult}");
+                        // TODO: Update the UI with the current result
+
+                        await Task.Delay(decoder_polling_interval, token).ConfigureAwait(false);
+                    }
                 }
-
-                string currentResult = clonedDecoder.GetDecodedMessage();
-                Console.WriteLine($"Current message: {currentResult}");
-
-                alreadyReading = false;
             }
         }
+
+        #endregion
 
         private void userSentFrames(int userId, FrameDataBundle bundle)
         {
@@ -148,6 +183,7 @@ namespace osu.Game.Screens.Play
                 convertedFrame.Time = frame.Time;
                 convertedFrame.Header = frame.Header;
                 score.Replay.Frames.Add(convertedFrame);
+                frameListReader.AddFrame(convertedFrame);
             }
 
             if (isFirstBundle && score.Replay.Frames.Count > 0) SetGameplayStartTime(score.Replay.Frames[0].Time);
@@ -175,7 +211,7 @@ namespace osu.Game.Screens.Play
             {
                 SpectatorClient.OnNewFrames -= userSentFrames;
                 SpectatorClient.OnNewFrames -= tryFindDecoder;
-                SpectatorClient.OnNewFrames -= readReplayFrames;
+                cts.Cancel();
             }
         }
     }
