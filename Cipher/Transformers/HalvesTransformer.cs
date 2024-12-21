@@ -45,8 +45,6 @@ namespace Cipher.Transformers
             // Write the parts to the mantissas of X and Y
             FloatHelper.ReplaceBits(ref mousePosition.X, xBits);
             FloatHelper.ReplaceBits(ref mousePosition.Y, yBits);
-
-            Console.WriteLine("Encoded first frame");
         }
 
         private void transformSecondFrame(ref Vector2 mousePosition, ref InputHelper input)
