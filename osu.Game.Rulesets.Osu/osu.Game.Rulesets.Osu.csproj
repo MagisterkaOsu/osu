@@ -13,6 +13,7 @@
   </PropertyGroup>
 
   <ItemGroup Label="Project References">
+    <ProjectReference Include="..\Cipher\Cipher.csproj" />
     <ProjectReference Include="..\osu.Game\osu.Game.csproj" />
   </ItemGroup>
 </Project>

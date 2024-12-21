@@ -2,8 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using Cipher.Helpers;
 using NUnit.Framework;
-using osu.Game.Rulesets.Osu.Mods.CipherHelpers;
 
 namespace osu.Game.Rulesets.Osu.Tests.Mods.CipherHelpers
 {

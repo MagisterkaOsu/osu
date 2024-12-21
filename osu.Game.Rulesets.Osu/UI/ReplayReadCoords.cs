@@ -5,6 +5,9 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using Cipher.Helpers;
+using Cipher.Interfaces;
+using Cipher.Transformers;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -51,10 +54,37 @@ namespace osu.Game.Rulesets.Osu.UI
 
         protected override void LoadComplete()
         {
-            // pass replay to decoder to set decodedString value
-            foreach (var mod in mods.OfType<IDecodesReplay>())
+            tryDecodeReplay();
+        }
+
+        private void tryDecodeReplay()
+        {
+            var firstFrame = replayFrames.FirstOrDefault();
+            if (firstFrame == null) return;
+
+            string xBits = FloatHelper.GetFloatBits(firstFrame.Position.X);
+            string yBits = FloatHelper.GetFloatBits(firstFrame.Position.Y);
+            string frameKey = xBits + yBits;
+
+            var decoders = new Dictionary<string, IDecoder>
             {
-                if (mod.DecodedString != null) decodedString.Value = mod.DecodedString.Invoke(replay.Frames);
+                { BitEncoder.FIRST_FRAME_KEY, new BitDecoder() },
+                { HalvesEncoder.FIRST_FRAME_KEY, new HalvesDecoder() },
+                { NetworkTestEncoder.FIRST_FRAME_KEY, new NetworkTestDecoder() }
+            };
+
+            if (decoders.TryGetValue(frameKey, out var matchingDecoder))
+            {
+                foreach (var frame in replayFrames.Cast<OsuReplayFrame>())
+                {
+                    matchingDecoder.ProcessFrame(frame);
+                }
+
+                decodedString.Value = matchingDecoder.GetDecodedMessage();
+            }
+            else
+            {
+                decodedString.Value = "<no value>";
             }
         }
 

@@ -2,31 +2,31 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Linq;
+using Cipher.Transformers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.Replays;
-using System.Linq;
-using Cipher.Transformers;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Mods.CipherTransformers
 {
-    public class HalvesTransformerMod : OsuModCipher
+    public class NetworkTestTransformerMod : OsuModCipher
     {
-        public override string Name => "Halves";
-        public override string Acronym => "HV";
-        public override LocalisableString Description => ".5 - '1' ; .0 - '0'";
-        public override IconUsage? Icon => FontAwesome.Solid.StarHalf;
-        public override string FirstFrameKey => HalvesEncoder.FIRST_FRAME_KEY;
+        public override string Name => "Network Test";
+        public override string Acronym => "NT";
+        public override LocalisableString Description => "Tests order of frames sent over network";
+        public override IconUsage? Icon => FontAwesome.Solid.Columns;
 
-        private readonly HalvesEncoder encoder = new HalvesEncoder();
-        private readonly HalvesDecoder decoder = new HalvesDecoder();
+        public override string FirstFrameKey => NetworkTestEncoder.FIRST_FRAME_KEY;
+
+        private readonly NetworkTestEncoder encoder = new NetworkTestEncoder();
+        private readonly NetworkTestDecoder decoder = new NetworkTestDecoder();
 
         public override Vector2 Transform(Vector2 mousePosition, bool pressedActions)
         {
-            FrameCounter++;
-            return FrameCounter > RandomFrameOffset ? encoder.Encode(mousePosition, pressedActions, ref Plaintext) : mousePosition;
+            return encoder.Encode(mousePosition);
         }
 
         public override string Decode(List<ReplayFrame> frames)

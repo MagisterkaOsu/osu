@@ -162,7 +162,8 @@ namespace osu.Game.Rulesets.Osu
                     {
                         new CircleDanceTransformerMod(),
                         new HalvesTransformerMod(),
-                        new BitEncoderTransformerMod()
+                        new BitEncoderTransformerMod(),
+                        new NetworkTestTransformerMod()
                     };
 
                 case ModType.DifficultyReduction:
