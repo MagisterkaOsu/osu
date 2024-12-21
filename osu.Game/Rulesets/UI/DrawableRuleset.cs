@@ -315,7 +315,6 @@ namespace osu.Game.Rulesets.UI
                 // Set handlers for cipher operations
                 recorder.TransformMouseInput = mod.TransformMouseInput;
                 // Hide cipher mods from server
-                // TODO: Need to check if spectators can see this
                 Mod m = (Mod)mod;
                 score.ScoreInfo.RemoveModFromAPIMods(m.Acronym);
                 score.ScoreInfo.UpdateModsJson();
