@@ -11,7 +11,7 @@ using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Replays;
 using osuTK;
 
-namespace osu.Game.Rulesets.Osu.Mods.CipherTransformers
+namespace osu.Game.Rulesets.Osu.Mods.Ciphers
 {
     public class CircleDanceTransformerMod : OsuModCipher
     {
@@ -19,9 +19,10 @@ namespace osu.Game.Rulesets.Osu.Mods.CipherTransformers
         public override string Acronym => "CD";
         public override LocalisableString Description => "Spins circles around original position";
 
-        public override IconUsage? Icon => FontAwesome.Solid.CompressArrowsAlt;
+        public override IconUsage? Icon => FontAwesome.Solid.QuestionCircle;
 
         [SettingSource("Circle radius", "The radius the cursor goes around", SettingControlType = typeof(MultiplierSettingsSlider))]
+
         public BindableNumber<double> CircleRadius { get; } = new BindableDouble(100)
         {
             MinValue = 1,
@@ -49,7 +50,7 @@ namespace osu.Game.Rulesets.Osu.Mods.CipherTransformers
 
         public override string Decode(List<ReplayFrame> frames)
         {
-            return "test";
+            return "<no value>";
         }
     }
 }
