@@ -7,7 +7,7 @@ using osuTK;
 
 namespace Cipher.Transformers
 {
-    public class BitEncoder
+    public class LSBMaskEncoder
     {
         public static readonly string FIRST_FRAME_KEY = "1011111110010111100111110111100010111111111100101010101100111110";
         private bool wroteSecondFrame;
@@ -83,7 +83,7 @@ namespace Cipher.Transformers
         }
     }
 
-    public class BitDecoder : IDecoder
+    public class LSBMaskDecoder : IDecoder
     {
         private string readBits = string.Empty;
         private int messageLength;
@@ -133,7 +133,7 @@ namespace Cipher.Transformers
 
         public IDecoder Clone()
         {
-            return (BitDecoder)MemberwiseClone();
+            return (LSBMaskDecoder)MemberwiseClone();
         }
     }
 }

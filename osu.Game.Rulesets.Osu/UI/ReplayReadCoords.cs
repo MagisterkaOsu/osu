@@ -59,21 +59,28 @@ namespace osu.Game.Rulesets.Osu.UI
 
         private void tryDecodeReplay()
         {
-            var firstFrame = replayFrames.FirstOrDefault();
-            if (firstFrame == null) return;
-
-            string xBits = FloatHelper.GetFloatBits(firstFrame.Position.X);
-            string yBits = FloatHelper.GetFloatBits(firstFrame.Position.Y);
-            string frameKey = xBits + yBits;
-
             var decoders = new Dictionary<string, IDecoder>
             {
-                { BitEncoder.FIRST_FRAME_KEY, new BitDecoder() },
-                { HalvesEncoder.FIRST_FRAME_KEY, new HalvesDecoder() },
+                { LSBMaskEncoder.FIRST_FRAME_KEY, new LSBMaskDecoder() },
+                { FractionsEncoder.FIRST_FRAME_KEY, new FractionsDecoder() },
                 { NetworkTestEncoder.FIRST_FRAME_KEY, new NetworkTestDecoder() }
             };
 
-            if (decoders.TryGetValue(frameKey, out var matchingDecoder))
+            IDecoder? matchingDecoder = null;
+
+            foreach (var frame in replayFrames)
+            {
+                string xBits = FloatHelper.GetFloatBits(frame.Position.X);
+                string yBits = FloatHelper.GetFloatBits(frame.Position.Y);
+                string frameKey = xBits + yBits;
+
+                if (!decoders.TryGetValue(frameKey, out var value)) continue;
+
+                matchingDecoder = value;
+                break;
+            }
+
+            if (matchingDecoder != null)
             {
                 foreach (var frame in replayFrames.Cast<OsuReplayFrame>())
                 {

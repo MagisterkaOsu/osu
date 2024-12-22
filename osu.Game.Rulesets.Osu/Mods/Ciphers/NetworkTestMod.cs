@@ -10,16 +10,14 @@ using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.Replays;
 using osuTK;
 
-namespace osu.Game.Rulesets.Osu.Mods.CipherTransformers
+namespace osu.Game.Rulesets.Osu.Mods.Ciphers
 {
-    public class NetworkTestTransformerMod : OsuModCipher
+    public class NetworkTestMod : OsuModCipher
     {
         public override string Name => "Network Test";
         public override string Acronym => "NT";
         public override LocalisableString Description => "Tests order of frames sent over network";
-        public override IconUsage? Icon => FontAwesome.Solid.Columns;
-
-        public override string FirstFrameKey => NetworkTestEncoder.FIRST_FRAME_KEY;
+        public override IconUsage? Icon => FontAwesome.Solid.AddressBook;
 
         private readonly NetworkTestEncoder encoder = new NetworkTestEncoder();
         private readonly NetworkTestDecoder decoder = new NetworkTestDecoder();

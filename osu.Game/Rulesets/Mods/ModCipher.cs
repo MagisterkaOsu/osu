@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text.Json.Serialization;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Configuration;
@@ -28,13 +27,6 @@ namespace osu.Game.Rulesets.Mods
         public Func<Vector2, Vector2>? TransformMouseInputDelegate;
         public virtual Func<Vector2, bool, Vector2>? TransformMouseInput { get; set; }
         public virtual Func<List<ReplayFrame>, string>? DecodedString { get; set; }
-
-        /// <summary>
-        /// Denotes the key to represent the cipher used
-        /// </summary>
-        [JsonIgnore]
-        public virtual string FirstFrameKey => "";
-
         protected int RandomFrameOffset = new Random().Next(300, 400);
         protected int FrameCounter = -1;
     }

@@ -45,22 +45,5 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             Plaintext = new InputHelper(PlaintextBindable.Value);
         }
-
-        protected bool WroteFirstFrame;
-
-        protected void TransformFirstFrame(ref Vector2 mousePosition)
-        {
-            if (WroteFirstFrame) throw new ArgumentException("Trying to write first frame when it was already written");
-            if (FirstFrameKey.Length != 64) throw new ArgumentException("FirstFrameKey is of invalid length");
-
-            // Split FirstFrameKey into two parts
-            string xBits = FirstFrameKey.Substring(0, 32);
-            string yBits = FirstFrameKey.Substring(32, 32);
-
-            // Write the parts to the mantissas of X and Y
-            FloatHelper.ReplaceBits(ref mousePosition.X, xBits);
-            FloatHelper.ReplaceBits(ref mousePosition.Y, yBits);
-            WroteFirstFrame = true;
-        }
     }
 }

@@ -4,15 +4,15 @@
 using System.Collections.Generic;
 using Cipher.Helpers;
 using NUnit.Framework;
-using osu.Game.Rulesets.Osu.Mods.CipherTransformers;
+using osu.Game.Rulesets.Osu.Mods.Ciphers;
 using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.Replays;
 using osuTK;
 
-namespace osu.Game.Rulesets.Osu.Tests.Mods.CipherMods
+namespace osu.Game.Rulesets.Osu.Tests.Mods.Ciphers
 {
     [TestFixture]
-    public class BitEncoderTransformerModTest
+    public class LSBMaskEncoderModTest
     {
         private const string test_message = "Hello, Cipher!";
         private const int frame_count = 200;
@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods.CipherMods
         [Test]
         public void TestEndToEnd()
         {
-            var transformer = new BitEncoderTransformerMod();
+            var transformer = new LSBMaskEncoderMod();
             transformer.Mask.Value = 0b11111111;
             transformer.Plaintext = new InputHelper(test_message);
 

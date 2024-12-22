@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
@@ -10,18 +11,18 @@ using System.Linq;
 using Cipher.Transformers;
 using osuTK;
 
-namespace osu.Game.Rulesets.Osu.Mods.CipherTransformers
+namespace osu.Game.Rulesets.Osu.Mods.Ciphers
 {
-    public class HalvesTransformerMod : OsuModCipher
+    public class FractionsTransformerMod : OsuModCipher
     {
-        public override string Name => "Halves";
-        public override string Acronym => "HV";
+        public override string Name => "Fractions";
+        public override string Acronym => "FRC";
         public override LocalisableString Description => ".5 - '1' ; .0 - '0'";
         public override IconUsage? Icon => FontAwesome.Solid.StarHalf;
-        public override string FirstFrameKey => HalvesEncoder.FIRST_FRAME_KEY;
+        public override Type[] IncompatibleMods => new[] { typeof(LSBMaskEncoderMod) };
 
-        private readonly HalvesEncoder encoder = new HalvesEncoder();
-        private readonly HalvesDecoder decoder = new HalvesDecoder();
+        private readonly FractionsEncoder encoder = new FractionsEncoder();
+        private readonly FractionsDecoder decoder = new FractionsDecoder();
 
         public override Vector2 Transform(Vector2 mousePosition, bool pressedActions)
         {

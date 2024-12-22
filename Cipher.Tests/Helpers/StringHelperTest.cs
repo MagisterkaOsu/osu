@@ -2,9 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using Cipher.Helpers;
-using NUnit.Framework;
 
-namespace osu.Game.Rulesets.Osu.Tests.Mods.CipherHelpers
+namespace Cipher.Tests.Helpers
 {
     [TestFixture]
     public class StringHelperTest

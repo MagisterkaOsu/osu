@@ -10,7 +10,7 @@ using StringHelper = Cipher.Helpers.StringHelper;
 
 namespace Cipher.Transformers
 {
-    public class HalvesEncoder
+    public class FractionsEncoder
     {
         public static readonly string FIRST_FRAME_KEY = "1011111110010101100111110111100010111111111100101010101100101010";
         public static readonly string[] ZERO_FRACTIONS = { "0" };
@@ -70,7 +70,7 @@ namespace Cipher.Transformers
         }
     }
 
-    public class HalvesDecoder : IDecoder
+    public class FractionsDecoder : IDecoder
     {
         private string readBits = string.Empty;
         private int messageLength;
@@ -87,7 +87,7 @@ namespace Cipher.Transformers
                 string yBits = FloatHelper.GetFloatBits(position.Y);
                 string frameKey = xBits + yBits;
 
-                if (frameKey == HalvesEncoder.FIRST_FRAME_KEY)
+                if (frameKey == FractionsEncoder.FIRST_FRAME_KEY)
                 {
                     frameIndex++;
                 }
@@ -121,7 +121,7 @@ namespace Cipher.Transformers
 
         public IDecoder Clone()
         {
-            return (HalvesDecoder)MemberwiseClone();
+            return (FractionsDecoder)MemberwiseClone();
         }
     }
 }
