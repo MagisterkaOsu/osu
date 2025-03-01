@@ -1,11 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
-using NUnit.Framework;
-using osu.Game.Rulesets.Osu.Mods.CipherHelpers;
+using Cipher.Helpers;
 
-namespace osu.Game.Rulesets.Osu.Tests.Mods.CipherHelpers
+namespace Cipher.Tests.Helpers
 {
     [TestFixture]
     public class FloatHelperTest
@@ -133,6 +131,17 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods.CipherHelpers
 
             FloatHelper.SetMantissaBitsWithMask(ref mantissaBits, mask, bits_to_set);
             Assert.AreEqual("00000000000000000100010", mantissaBits);
+        }
+
+        [Test]
+        public void TestGetMantissaBitsWithMask()
+        {
+            const int mask = 0b0101010101;
+            string input = "00000000000001100110011";
+            const string expected_output = "10101";
+            string output = FloatHelper.GetMantissaBitsWithMask(ref input, mask);
+
+            Assert.AreEqual(expected_output, output);
         }
     }
 }

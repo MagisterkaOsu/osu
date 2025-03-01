@@ -2,6 +2,8 @@
   "solution": {
     "path": "osu.sln",
     "projects": [
+      "Cipher.Tests\\Cipher.Tests.csproj",
+      "Cipher\\Cipher.csproj",
       "osu.Desktop\\osu.Desktop.csproj",
       "osu.Game.Benchmarks\\osu.Game.Benchmarks.csproj",
       "osu.Game.Rulesets.Catch.Tests\\osu.Game.Rulesets.Catch.Tests.csproj",

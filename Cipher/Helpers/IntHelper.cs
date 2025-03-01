@@ -1,7 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-namespace osu.Game.Rulesets.Osu.Mods.CipherHelpers
+namespace Cipher.Helpers
 {
     public class IntHelper
     {
@@ -16,6 +16,19 @@ namespace osu.Game.Rulesets.Osu.Mods.CipherHelpers
             }
 
             return count;
+        }
+
+        public static int ParseBitString(string bitString)
+        {
+            int result = 0;
+
+            for (int i = 0; i < bitString.Length; i++)
+            {
+                result <<= 1;
+                result |= bitString[i] == '1' ? 1 : 0;
+            }
+
+            return result;
         }
     }
 }
