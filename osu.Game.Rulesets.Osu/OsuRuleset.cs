@@ -162,6 +162,7 @@ namespace osu.Game.Rulesets.Osu
                     {
                         new FractionsTransformerMod(),
                         new LSBMaskEncoderMod(),
+                        new LetterMappingMod(),
                         new NetworkTestMod(),
                         new CircleDanceTransformerMod(),
                     };

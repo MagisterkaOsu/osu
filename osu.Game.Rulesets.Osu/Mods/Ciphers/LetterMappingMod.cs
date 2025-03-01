@@ -16,24 +16,24 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Mods.Ciphers
 {
-    public class LSBMaskEncoderMod : OsuModCipher
+    public class LetterMappingMod : OsuModCipher
     {
-        public override string Name => "LSB Mask";
-        public override string Acronym => "LSB";
-        public override LocalisableString Description => "Masks mantissa bits in cursor data";
-        public override IconUsage? Icon => FontAwesome.Solid.Columns;
+        public override string Name => "Letter Mapping";
+        public override string Acronym => "LM";
+        public override LocalisableString Description => "Maps letters to cursor positions";
+        public override IconUsage? Icon => FontAwesome.Solid.AddressBook;
 
-        [SettingSource("Mask", "Message mask", SettingControlType = typeof(SettingsNumberBox))]
-        public Bindable<int?> Mask { get; } = new Bindable<int?>(0);
+        [SettingSource("Position", "Fractional position", SettingControlType = typeof(SettingsNumberBox))]
+        public Bindable<int?> Position { get; } = new Bindable<int?>(0);
         public override Type[] IncompatibleMods => new[] { typeof(FractionsTransformerMod) };
 
-        private readonly LSBMaskEncoder encoder = new LSBMaskEncoder();
-        private readonly LSBMaskDecoder decoder = new LSBMaskDecoder();
+        private readonly LetterMappingEncoder encoder = new LetterMappingEncoder();
+        private readonly LetterMappingDecoder decoder = new LetterMappingDecoder();
 
         public override Vector2 Transform(Vector2 mousePosition, bool pressedActions)
         {
             FrameCounter++;
-            return FrameCounter > RandomFrameOffset ? encoder.Encode(mousePosition, pressedActions, ref Plaintext, Mask.Value) : mousePosition;
+            return FrameCounter > RandomFrameOffset ? encoder.Encode(mousePosition, pressedActions, ref Plaintext, Position.Value) : mousePosition;
         }
 
         public override string Decode(List<ReplayFrame> frames)

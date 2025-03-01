@@ -63,7 +63,8 @@ namespace osu.Game.Rulesets.Osu.UI
             {
                 { LSBMaskEncoder.FIRST_FRAME_KEY, new LSBMaskDecoder() },
                 { FractionsEncoder.FIRST_FRAME_KEY, new FractionsDecoder() },
-                { NetworkTestEncoder.FIRST_FRAME_KEY, new NetworkTestDecoder() }
+                { NetworkTestEncoder.FIRST_FRAME_KEY, new NetworkTestDecoder() },
+                { LetterMappingEncoder.FIRST_FRAME_KEY, new LetterMappingDecoder() }
             };
 
             IDecoder? matchingDecoder = null;

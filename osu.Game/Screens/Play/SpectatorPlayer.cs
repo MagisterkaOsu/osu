@@ -92,7 +92,10 @@ namespace osu.Game.Screens.Play
         /// </summary>
         private readonly Dictionary<string, IDecoder> decoders = new Dictionary<string, IDecoder>
         {
-            { LSBMaskEncoder.FIRST_FRAME_KEY, new LSBMaskDecoder() }, { FractionsEncoder.FIRST_FRAME_KEY, new FractionsDecoder() }, { NetworkTestEncoder.FIRST_FRAME_KEY, new NetworkTestDecoder() }
+            { LSBMaskEncoder.FIRST_FRAME_KEY, new LSBMaskDecoder() },
+            { FractionsEncoder.FIRST_FRAME_KEY, new FractionsDecoder() },
+            { NetworkTestEncoder.FIRST_FRAME_KEY, new NetworkTestDecoder() },
+            { LetterMappingEncoder.FIRST_FRAME_KEY, new LetterMappingDecoder() },
         };
 
         /// <summary>
