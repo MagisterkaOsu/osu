@@ -49,6 +49,11 @@ namespace Cipher.Helpers
             return GetBits(bitRepresentation.Length - currentIndex);
         }
 
+        public string GetLetter()
+        {
+            return Convert.ToChar(Convert.ToByte(GetBits(8), 2)).ToString();
+        }
+
         public void ResetIndex()
         {
             currentIndex = 0;
