@@ -10,15 +10,15 @@ using StringHelper = Cipher.Helpers.StringHelper;
 
 namespace Cipher.Transformers
 {
-    public class FractionsEncoder
+    public class FractionsEncoder : IEncoder
     {
-        public static readonly string FIRST_FRAME_KEY = "1011111110010101100111110111100010111111111100101010101100101010";
+        public static string FIRST_FRAME_KEY { get; } = "1011111110010101100111110111100010111111111100101010101100101010";
         public static readonly string[] ZERO_FRACTIONS = { "0" };
         public static readonly string[] ONE_FRACTIONS = { "5" };
         private bool wroteFirstFrame;
         private bool wroteSecondFrame;
 
-        public Vector2 Encode(Vector2 mousePosition, bool pressedActions, ref InputHelper input)
+        public Vector2 Encode(Vector2 mousePosition, bool pressedActions, ref InputHelper input, params object[] parameters)
         {
             if (!wroteFirstFrame)
             {
