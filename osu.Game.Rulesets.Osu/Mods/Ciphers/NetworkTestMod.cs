@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Osu.Mods.Ciphers
 
         public override Vector2 Transform(Vector2 mousePosition, bool pressedActions)
         {
-            return encoder.Encode(mousePosition);
+            return encoder.Encode(mousePosition, pressedActions, ref Plaintext);
         }
 
         public override string Decode(List<ReplayFrame> frames)

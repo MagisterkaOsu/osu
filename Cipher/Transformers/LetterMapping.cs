@@ -7,16 +7,21 @@ using osuTK;
 
 namespace Cipher.Transformers
 {
-    public class LetterMappingEncoder
+    public class LetterMappingEncoder : IEncoder
     {
-        public static readonly string FIRST_FRAME_KEY = "1011111110010101100111110111100010111111111100101010101100110000";
+        public static string FIRST_FRAME_KEY { get; } = "1011111110010101100111110111100010111111111100101010101100110000";
         private bool wroteFirstFrame;
         private bool wroteSecondFrame;
         private readonly Random random = new Random();
 
-        public Vector2 Encode(Vector2 mousePosition, bool pressedActions, ref InputHelper input, int? position)
+        public Vector2 Encode(Vector2 mousePosition, bool pressedActions, ref InputHelper input, params object[] parameters)
         {
-            if (position == null) return mousePosition;
+            int? position = null;
+
+            if (parameters != null && parameters.Length > 0 && parameters[0] is int?)
+            {
+                position = (int?)parameters[0];
+            }
 
             if (!wroteFirstFrame)
             {

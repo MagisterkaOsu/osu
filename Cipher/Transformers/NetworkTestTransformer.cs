@@ -7,13 +7,13 @@ using osuTK;
 
 namespace Cipher.Transformers
 {
-    public class NetworkTestEncoder
+    public class NetworkTestEncoder : IEncoder
     {
-        public static readonly string FIRST_FRAME_KEY = "1011111110010101100111110111100010111111111100101010101101111010";
+        public static string FIRST_FRAME_KEY { get; } = "1011111110010101100111110111100010111111111100101010101101111010";
         private bool wroteFirstFrame;
         private int frameCount;
 
-        public Vector2 Encode(Vector2 mousePosition)
+        public Vector2 Encode(Vector2 mousePosition, bool pressedActions, ref InputHelper input, params object[] parameters)
         {
             if (!wroteFirstFrame)
             {
