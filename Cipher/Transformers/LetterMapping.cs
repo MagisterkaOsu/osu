@@ -54,7 +54,7 @@ namespace Cipher.Transformers
 
         private void transformSecondFrame(ref Vector2 mousePosition, ref InputHelper input, int position)
         {
-            int plainTextLength = input.GetLength();
+            int plainTextLength = input.GetLetterLength();
             string plainTextLengthBinary = Convert.ToString(plainTextLength, 2).PadLeft(23, '0');
             FloatHelper.ReplaceMantissaBits(ref mousePosition.X, plainTextLengthBinary);
 
@@ -94,7 +94,7 @@ namespace Cipher.Transformers
 
     public class LetterMappingDecoder : IDecoder
     {
-        private string readBits = string.Empty;
+        private string readString = string.Empty;
         private int messageLength;
         private int position;
         private int frameIndex;
@@ -127,10 +127,10 @@ namespace Cipher.Transformers
                 return;
             }
 
-            if (readBits.Length < messageLength)
+            if (readString.Length < messageLength)
             {
-                string xFraction = FloatHelper.GetFraction(ref position.X);
-                string yFraction = FloatHelper.GetFraction(ref position.Y);
+                string xFraction = FloatHelper.GetFraction(ref position.X).PadRight(this.position + 1, '0');
+                string yFraction = FloatHelper.GetFraction(ref position.Y).PadRight(this.position + 1, '0');
                 string leftDigit = xFraction[this.position].ToString();
                 string rightDigit = yFraction[this.position].ToString();
                 int ascii = int.Parse($"{leftDigit}{rightDigit}");
@@ -138,8 +138,7 @@ namespace Cipher.Transformers
                 if (ascii < 95)
                 {
                     char letter = (char)(ascii + 32);
-                    string bits = Convert.ToString(letter, 2).PadLeft(8, '0');
-                    readBits += bits;
+                    readString += letter;
                 }
             }
 
@@ -148,7 +147,7 @@ namespace Cipher.Transformers
 
         public string GetDecodedMessage()
         {
-            return StringHelper.ParseBitString(readBits);
+            return readString;
         }
 
         public IDecoder Clone()

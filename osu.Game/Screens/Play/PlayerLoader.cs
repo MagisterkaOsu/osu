@@ -69,11 +69,13 @@ namespace osu.Game.Screens.Play
         /// <summary>
         /// A fill flow containing the player settings groups, exposed for the ability to hide it from inheritors of the player loader.
         /// </summary>
-        protected FillFlowContainer<PlayerSettingsGroup> PlayerSettings { get; private set; } = null!;
+        public FillFlowContainer<PlayerSettingsGroup> PlayerSettings { get; private set; } = null!;
 
         protected VisualSettings VisualSettings { get; private set; } = null!;
 
         protected AudioSettings AudioSettings { get; private set; } = null!;
+
+        protected DecipheringGroup DecipheringGroup { get; private set; } = null!;
 
         protected Task? LoadTask { get; private set; }
 
@@ -234,7 +236,7 @@ namespace osu.Game.Screens.Play
                         {
                             VisualSettings = new VisualSettings(),
                             AudioSettings = new AudioSettings(),
-                            new InputSettings()
+                            new InputSettings(),
                         }
                     },
                 },
@@ -466,6 +468,17 @@ namespace osu.Game.Screens.Play
 
         protected virtual void OnPlayerLoaded()
         {
+            if (CurrentPlayer is SoloSpectatorPlayer soloSpectatorPlayer)
+            {
+                soloSpectatorPlayer.currentMessage.BindValueChanged(message =>
+                {
+                    CurrentPlayer.HUDOverlay.PlayerSettingsOverlay.DecipheringGroup.DecodedString.Value = message.NewValue;
+                }, true);
+            }
+            else
+            {
+                CurrentPlayer?.HUDOverlay.PlayerSettingsOverlay.DecipheringGroup.Hide();
+            }
         }
 
         private void prepareForRestart(bool quickRestartRequested)

@@ -8,11 +8,11 @@ namespace Cipher.Helpers
         {
             var result = new StringBuilder();
 
-            for (int i = 0; i < bitString.Length; i += 8)
+            for (int i = 0; i < bitString.Length; i += 7)
             {
                 if (bitString.Length >= i + 7)
                 {
-                    string byteString = bitString.Substring(i, 8);
+                    string byteString = bitString.Substring(i, 7);
                     char character = (char)Convert.ToInt32(byteString, 2);
                     result.Append(character);
                 }
