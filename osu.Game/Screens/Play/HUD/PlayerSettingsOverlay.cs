@@ -22,6 +22,8 @@ namespace osu.Game.Screens.Play.HUD
     {
         public VisualSettings VisualSettings { get; private set; }
 
+        public DecipheringGroup DecipheringGroup { get; private set; }
+
         private const float padding = 10;
 
         public const float EXPANDED_WIDTH = player_settings_width + padding * 2;
@@ -62,7 +64,8 @@ namespace osu.Game.Screens.Play.HUD
                 Children = new PlayerSettingsGroup[]
                 {
                     VisualSettings = new VisualSettings { Expanded = { Value = false } },
-                    new AudioSettings { Expanded = { Value = false } }
+                    new AudioSettings { Expanded = { Value = false } },
+                    DecipheringGroup = new DecipheringGroup()
                 }
             });
 

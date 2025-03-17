@@ -7,15 +7,22 @@ using osuTK;
 
 namespace Cipher.Transformers
 {
-    public class LSBMaskEncoder
+    public class LSBMaskEncoder : IEncoder
     {
-        public static readonly string FIRST_FRAME_KEY = "1011111110010111100111110111100010111111111100101010101100111110";
+        public static string FIRST_FRAME_KEY { get; } = "1011111110010111100111110111100010111111111100101010101100111110";
         private bool wroteSecondFrame;
         private bool wroteFirstFrame;
         private readonly Random random = new Random();
 
-        public Vector2 Encode(Vector2 mousePosition, bool pressedActions, ref InputHelper input, int? mask)
+        public Vector2 Encode(Vector2 mousePosition, bool pressedActions, ref InputHelper input, params object[] parameters)
         {
+            int? mask = null;
+
+            if (parameters != null && parameters.Length > 0 && parameters[0] is int?)
+            {
+                mask = (int?)parameters[0];
+            }
+
             if (mask == null) return mousePosition;
 
             if (!wroteFirstFrame)

@@ -9,6 +9,7 @@ using Cipher.Helpers;
 using Cipher.Interfaces;
 using Cipher.Transformers;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Screens;
@@ -118,6 +119,8 @@ namespace osu.Game.Screens.Play
         /// </summary>
         private const int decoder_polling_interval = 1000;
 
+        public Bindable<string> currentMessage = new Bindable<string>();
+
         private void tryFindDecoder(int userId, FrameDataBundle bundle)
         {
             if (decoder == null)
@@ -158,10 +161,8 @@ namespace osu.Game.Screens.Play
                     }
                     else
                     {
-                        string currentResult = decoder.GetDecodedMessage();
-                        Console.WriteLine($"Current message: {currentResult}");
-                        // TODO: Update the UI with the current result
-
+                        string message = decoder.GetDecodedMessage();
+                        currentMessage.Value = message;
                         await Task.Delay(decoder_polling_interval, token).ConfigureAwait(false);
                     }
                 }

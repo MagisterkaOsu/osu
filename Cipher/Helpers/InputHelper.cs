@@ -15,7 +15,7 @@ namespace Cipher.Helpers
 
             foreach (char c in inputString)
             {
-                bitRepresentation += Convert.ToString(c, 2).PadLeft(8, '0');
+                bitRepresentation += Convert.ToString(c, 2).PadLeft(7, '0');
             }
         }
 
@@ -51,7 +51,7 @@ namespace Cipher.Helpers
 
         public string GetLetter()
         {
-            return Convert.ToChar(Convert.ToByte(GetBits(8), 2)).ToString();
+            return Convert.ToChar(Convert.ToByte(GetBits(7), 2)).ToString();
         }
 
         public void ResetIndex()
@@ -62,6 +62,11 @@ namespace Cipher.Helpers
         public int GetLength()
         {
             return bitRepresentation.Length;
+        }
+
+        public int GetLetterLength()
+        {
+            return bitRepresentation.Length / 7;
         }
 
         public bool AreBitsLeft(int amount = 1)

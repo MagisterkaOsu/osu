@@ -47,7 +47,7 @@ namespace osu.Game.Rulesets.Osu.UI
         };
 
         public ReplayShowCoords(OsuRulesetConfigManager config)
-            : base("Player coordinates")
+            : base("Deciphering and position")
         {
             this.config = config;
         }
