@@ -470,7 +470,7 @@ namespace osu.Game.Screens.Play
         {
             if (CurrentPlayer is SoloSpectatorPlayer soloSpectatorPlayer)
             {
-                soloSpectatorPlayer.currentMessage.BindValueChanged(message =>
+                soloSpectatorPlayer.CurrentMessage.BindValueChanged(message =>
                 {
                     CurrentPlayer.HUDOverlay.PlayerSettingsOverlay.DecipheringGroup.DecodedString.Value = message.NewValue;
                 }, true);

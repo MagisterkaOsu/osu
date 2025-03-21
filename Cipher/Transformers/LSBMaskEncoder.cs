@@ -9,7 +9,7 @@ namespace Cipher.Transformers
 {
     public class LSBMaskEncoder : IEncoder
     {
-        public static string FIRST_FRAME_KEY { get; } = "1011111110010111100111110111100010111111111100101010101100111110";
+        public static string FIRST_FRAME_KEY { get; } = "000110101010110100011000111101";
         private bool wroteSecondFrame;
         private bool wroteFirstFrame;
         private readonly Random random = new Random();
@@ -27,7 +27,7 @@ namespace Cipher.Transformers
 
             if (!wroteFirstFrame)
             {
-                transformFirstFrame(ref mousePosition);
+                FrameHelper.TransformFirstFrame(ref mousePosition, FIRST_FRAME_KEY);
                 wroteFirstFrame = true;
                 return mousePosition;
             }
@@ -41,17 +41,6 @@ namespace Cipher.Transformers
 
             transformNthFrame(ref mousePosition, pressedActions, ref input, mask.Value);
             return mousePosition;
-        }
-
-        private void transformFirstFrame(ref Vector2 mousePosition)
-        {
-            // Split FirstFrameKey into two parts
-            string xBits = FIRST_FRAME_KEY.Substring(0, 32);
-            string yBits = FIRST_FRAME_KEY.Substring(32, 32);
-
-            // Write the parts to the mantissas of X and Y
-            FloatHelper.ReplaceBits(ref mousePosition.X, xBits);
-            FloatHelper.ReplaceBits(ref mousePosition.Y, yBits);
         }
 
         private void transformSecondFrame(ref Vector2 mousePosition, ref InputHelper input, int mask)
@@ -99,14 +88,11 @@ namespace Cipher.Transformers
 
         public void ProcessFrame(object frame)
         {
-            var fieldInfo = frame.GetType().GetField("Position");
-            Vector2 position = (Vector2)fieldInfo.GetValue(frame);
+            Vector2 position = FrameHelper.GetPositionFromFrameObject(ref frame);
 
             if (frameIndex == 0)
             {
-                string xBits = FloatHelper.GetFloatBits(position.X);
-                string yBits = FloatHelper.GetFloatBits(position.Y);
-                string frameKey = xBits + yBits;
+                string frameKey = FrameHelper.GetPotentialFirstFrameKey(ref position);
 
                 if (frameKey == LSBMaskEncoder.FIRST_FRAME_KEY)
                 {

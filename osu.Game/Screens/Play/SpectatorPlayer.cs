@@ -119,7 +119,7 @@ namespace osu.Game.Screens.Play
         /// </summary>
         private const int decoder_polling_interval = 1000;
 
-        public Bindable<string> currentMessage = new Bindable<string>();
+        public Bindable<string> CurrentMessage = new Bindable<string>();
 
         private void tryFindDecoder(int userId, FrameDataBundle bundle)
         {
@@ -129,9 +129,8 @@ namespace osu.Game.Screens.Play
 
                 foreach (var frame in bundle.Frames)
                 {
-                    string xBits = FloatHelper.GetFloatBits(frame.Position.X);
-                    string yBits = FloatHelper.GetFloatBits(frame.Position.Y);
-                    string frameKey = xBits + yBits;
+                    var position = frame.Position;
+                    string frameKey = FrameHelper.GetPotentialFirstFrameKey(ref position);
 
                     if (decoders.TryGetValue(frameKey, out var value))
                     {
@@ -162,7 +161,7 @@ namespace osu.Game.Screens.Play
                     else
                     {
                         string message = decoder.GetDecodedMessage();
-                        currentMessage.Value = message;
+                        CurrentMessage.Value = message;
                         await Task.Delay(decoder_polling_interval, token).ConfigureAwait(false);
                     }
                 }

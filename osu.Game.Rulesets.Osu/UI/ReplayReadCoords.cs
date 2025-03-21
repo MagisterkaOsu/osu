@@ -71,11 +71,9 @@ namespace osu.Game.Rulesets.Osu.UI
 
             foreach (var frame in replayFrames)
             {
-                string xBits = FloatHelper.GetFloatBits(frame.Position.X);
-                string yBits = FloatHelper.GetFloatBits(frame.Position.Y);
-                string frameKey = xBits + yBits;
+                string potentialKey = FrameHelper.GetPotentialFirstFrameKey(ref frame.Position);
 
-                if (!decoders.TryGetValue(frameKey, out var value)) continue;
+                if (!decoders.TryGetValue(potentialKey, out var value)) continue;
 
                 matchingDecoder = value;
                 break;
