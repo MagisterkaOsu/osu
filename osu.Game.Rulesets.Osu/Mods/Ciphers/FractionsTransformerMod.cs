@@ -18,8 +18,8 @@ namespace osu.Game.Rulesets.Osu.Mods.Ciphers
         public override string Name => "Fractions";
         public override string Acronym => "FRC";
         public override LocalisableString Description => ".5 - '1' ; .0 - '0'";
-        public override IconUsage? Icon => FontAwesome.Solid.StarHalf;
-        public override Type[] IncompatibleMods => new[] { typeof(LSBMaskEncoderMod) };
+        public override IconUsage? Icon => FontAwesome.Solid.Divide;
+        public override Type[] IncompatibleMods => new[] { typeof(LSBMaskEncoderMod), typeof(DecimalPositionEncoderMod), typeof(LetterMappingMod) };
 
         private readonly FractionsEncoder encoder = new FractionsEncoder();
         private readonly FractionsDecoder decoder = new FractionsDecoder();

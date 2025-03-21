@@ -18,8 +18,7 @@ namespace osu.Game.Rulesets.Osu.Mods.Ciphers
         public override string Name => "Circle Dance";
         public override string Acronym => "CD";
         public override LocalisableString Description => "Spins circles around original position";
-
-        public override IconUsage? Icon => FontAwesome.Solid.QuestionCircle;
+        public override IconUsage? Icon => FontAwesome.Solid.CircleNotch;
 
         [SettingSource("Circle radius", "The radius the cursor goes around", SettingControlType = typeof(MultiplierSettingsSlider))]
 

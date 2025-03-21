@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using Cipher.Helpers;
 using Cipher.Interfaces;
 using osuTK;
 using FloatHelper = Cipher.Helpers.FloatHelper;
@@ -12,7 +13,7 @@ namespace Cipher.Transformers
 {
     public class FractionsEncoder : IEncoder
     {
-        public static string FIRST_FRAME_KEY { get; } = "1011111110010101100111110111100010111111111100101010101100101010";
+        public static string FIRST_FRAME_KEY { get; } = "010010011101101001010001111011";
         public static readonly string[] ZERO_FRACTIONS = { "0" };
         public static readonly string[] ONE_FRACTIONS = { "5" };
         private bool wroteFirstFrame;
@@ -22,7 +23,7 @@ namespace Cipher.Transformers
         {
             if (!wroteFirstFrame)
             {
-                transformFirstFrame(ref mousePosition);
+                FrameHelper.TransformFirstFrame(ref mousePosition, FIRST_FRAME_KEY);
                 wroteFirstFrame = true;
                 return mousePosition;
             }
@@ -36,17 +37,6 @@ namespace Cipher.Transformers
 
             transformNthFrame(ref mousePosition, ref input);
             return mousePosition;
-        }
-
-        private void transformFirstFrame(ref Vector2 mousePosition)
-        {
-            // Split FirstFrameKey into two parts
-            string xBits = FIRST_FRAME_KEY.Substring(0, 32);
-            string yBits = FIRST_FRAME_KEY.Substring(32, 32);
-
-            // Write the parts to the mantissas of X and Y
-            FloatHelper.ReplaceBits(ref mousePosition.X, xBits);
-            FloatHelper.ReplaceBits(ref mousePosition.Y, yBits);
         }
 
         private void transformSecondFrame(ref Vector2 mousePosition, ref InputHelper input)
@@ -78,14 +68,11 @@ namespace Cipher.Transformers
 
         public void ProcessFrame(object frame)
         {
-            var fieldInfo = frame.GetType().GetField("Position");
-            Vector2 position = (Vector2)fieldInfo.GetValue(frame);
+            Vector2 position = FrameHelper.GetPositionFromFrameObject(ref frame);
 
             if (frameIndex == 0)
             {
-                string xBits = FloatHelper.GetFloatBits(position.X);
-                string yBits = FloatHelper.GetFloatBits(position.Y);
-                string frameKey = xBits + yBits;
+                string frameKey = FrameHelper.GetPotentialFirstFrameKey(ref position);
 
                 if (frameKey == FractionsEncoder.FIRST_FRAME_KEY)
                 {
@@ -98,7 +85,6 @@ namespace Cipher.Transformers
             if (frameIndex == 1)
             {
                 messageLength = IntHelper.ParseBitString(FloatHelper.GetMantissaBits(position.X));
-                Console.WriteLine($"Message length={messageLength}");
                 frameIndex++;
                 return;
             }
