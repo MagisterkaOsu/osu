@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Osu.Mods.Ciphers
         public override string Name => "Decimal Position";
         public override string Acronym => "DP";
         public override LocalisableString Description => "Replaces specific digit in fraction";
-        public override IconUsage? Icon => FontAwesome.Solid.Feather;
+        public override IconUsage? Icon => FontAwesome.Solid.Calculator;
 
         [SettingSource("Position", "Position of replaced digit", SettingControlType = typeof(SettingsNumberBox))]
         public Bindable<int?> Position { get; } = new Bindable<int?>(0);

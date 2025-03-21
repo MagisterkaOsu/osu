@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Osu.Mods.Ciphers
         public override string Name => "Network Test";
         public override string Acronym => "NT";
         public override LocalisableString Description => "Tests order of frames sent over network";
-        public override IconUsage? Icon => FontAwesome.Solid.AddressBook;
+        public override IconUsage? Icon => FontAwesome.Solid.NetworkWired;
 
         private readonly NetworkTestEncoder encoder = new NetworkTestEncoder();
         private readonly NetworkTestDecoder decoder = new NetworkTestDecoder();

@@ -21,11 +21,11 @@ namespace osu.Game.Rulesets.Osu.Mods.Ciphers
         public override string Name => "Letter Mapping";
         public override string Acronym => "LM";
         public override LocalisableString Description => "Maps letters to cursor positions";
-        public override IconUsage? Icon => FontAwesome.Solid.AddressBook;
+        public override IconUsage? Icon => FontAwesome.Solid.MapSigns;
 
         [SettingSource("Position", "Fractional position", SettingControlType = typeof(SettingsNumberBox))]
         public Bindable<int?> Position { get; } = new Bindable<int?>(0);
-        public override Type[] IncompatibleMods => new[] { typeof(FractionsTransformerMod) };
+        public override Type[] IncompatibleMods => new[] { typeof(FractionsTransformerMod), typeof(LSBMaskEncoderMod), typeof(DecimalPositionEncoderMod) };
 
         private readonly LetterMappingEncoder encoder = new LetterMappingEncoder();
         private readonly LetterMappingDecoder decoder = new LetterMappingDecoder();

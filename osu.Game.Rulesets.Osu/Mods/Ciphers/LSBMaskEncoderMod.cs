@@ -21,11 +21,11 @@ namespace osu.Game.Rulesets.Osu.Mods.Ciphers
         public override string Name => "LSB Mask";
         public override string Acronym => "LSB";
         public override LocalisableString Description => "Masks mantissa bits in cursor data";
-        public override IconUsage? Icon => FontAwesome.Solid.Columns;
+        public override IconUsage? Icon => FontAwesome.Solid.LayerGroup;
 
         [SettingSource("Mask", "Message mask", SettingControlType = typeof(SettingsNumberBox))]
         public Bindable<int?> Mask { get; } = new Bindable<int?>(0);
-        public override Type[] IncompatibleMods => new[] { typeof(FractionsTransformerMod) };
+        public override Type[] IncompatibleMods => new[] { typeof(FractionsTransformerMod), typeof(LetterMappingMod), typeof(DecimalPositionEncoderMod) };
 
         private readonly LSBMaskEncoder encoder = new LSBMaskEncoder();
         private readonly LSBMaskDecoder decoder = new LSBMaskDecoder();
