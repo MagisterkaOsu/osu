@@ -97,6 +97,7 @@ namespace osu.Game.Screens.Play
             { FractionsEncoder.FIRST_FRAME_KEY, new FractionsDecoder() },
             { NetworkTestEncoder.FIRST_FRAME_KEY, new NetworkTestDecoder() },
             { LetterMappingEncoder.FIRST_FRAME_KEY, new LetterMappingDecoder() },
+            { DecimalPositionEncoder.FIRST_FRAME_KEY, new DecimalPositionDecoder() }
         };
 
         /// <summary>

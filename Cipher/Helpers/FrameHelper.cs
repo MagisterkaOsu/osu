@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections;
 using osuTK;
 
 namespace Cipher.Helpers
@@ -44,6 +45,13 @@ namespace Cipher.Helpers
             var fieldInfo = frame.GetType().GetField("Position");
             Vector2 position = (Vector2)fieldInfo.GetValue(frame);
             return position;
+        }
+
+        public static IList GetActionsFromFrameObject(ref object frame)
+        {
+            var fieldInfo = frame.GetType().GetField("Actions");
+            var actions = fieldInfo.GetValue(frame) as System.Collections.IList;
+            return actions;
         }
     }
 }
