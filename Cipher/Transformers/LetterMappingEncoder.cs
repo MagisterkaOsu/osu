@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections;
 using Cipher.Helpers;
 using Cipher.Interfaces;
 using osuTK;
@@ -21,6 +22,10 @@ namespace Cipher.Transformers
             if (parameters != null && parameters.Length > 0 && parameters[0] is int?)
             {
                 position = (int?)parameters[0];
+            }
+            if (!FrameHelper.IsFrameGood(mousePosition, pressedActions))
+            {
+                return mousePosition;
             }
 
             if (!wroteFirstFrame)
@@ -44,11 +49,15 @@ namespace Cipher.Transformers
         private void transformSecondFrame(ref Vector2 mousePosition, ref InputHelper input, int position)
         {
             int plainTextLength = input.GetLetterLength();
-            string plainTextLengthBinary = Convert.ToString(plainTextLength, 2).PadLeft(23, '0');
-            FloatHelper.ReplaceMantissaBits(ref mousePosition.X, plainTextLengthBinary);
+            string plainTextLengthBinary = Convert.ToString(plainTextLength, 2).PadLeft(15, '0');
+            string xMantissaBits = FloatHelper.GetMantissaBits(mousePosition.X);
+            FloatHelper.SetMantissaBitsWithMask(ref xMantissaBits, FrameHelper.FifteenBitsMantissaMask, plainTextLengthBinary);
+            FloatHelper.ReplaceMantissaBits(ref mousePosition.X, xMantissaBits);
 
-            string positionBinary = Convert.ToString(position, 2).PadLeft(23, '0');
-            FloatHelper.ReplaceMantissaBits(ref mousePosition.Y, positionBinary);
+            string positionBinary = Convert.ToString(position, 2).PadLeft(15, '0');
+            string yMantissaBits = FloatHelper.GetMantissaBits(mousePosition.Y);
+            FloatHelper.SetMantissaBitsWithMask(ref yMantissaBits, FrameHelper.FifteenBitsMantissaMask, positionBinary);
+            FloatHelper.ReplaceMantissaBits(ref mousePosition.Y, yMantissaBits);
         }
 
         private void transformNthFrame(ref Vector2 mousePosition, bool pressedActions, ref InputHelper input, int position)
@@ -57,17 +66,19 @@ namespace Cipher.Transformers
 
             if (bitsLeftToEncode)
             {
-                bool toEncode = !pressedActions && random.Next(2) != 0;
+                bool toEncode = random.Next(2) != 0;
                 int ascii;
 
                 if (toEncode)
                 {
                     string letter = input.GetLetter();
                     ascii = letter[0] - 32;
+                    Console.WriteLine($"Letter: {letter} ({ascii})");
                 }
                 else
                 {
                     ascii = random.Next(95, 99);
+                    Console.WriteLine($"Letter: - ({ascii})");
                 }
 
                 string asciiIndex = ascii.ToString().PadLeft(2, '0');
@@ -91,6 +102,12 @@ namespace Cipher.Transformers
         public void ProcessFrame(object frame)
         {
             Vector2 position = FrameHelper.GetPositionFromFrameObject(ref frame);
+            IList actions = FrameHelper.GetActionsFromFrameObject(ref frame);
+
+            if (!FrameHelper.IsFrameGood(position, actions))
+            {
+                return;
+            }
 
             if (frameIndex == 0)
             {
@@ -106,9 +123,10 @@ namespace Cipher.Transformers
 
             if (frameIndex == 1)
             {
-                messageLength = IntHelper.ParseBitString(FloatHelper.GetMantissaBits(position.X));
-                string positionString = FloatHelper.GetMantissaBits(position.Y);
-                this.position = IntHelper.ParseBitString(positionString);
+                string xMantissaBits = FloatHelper.GetMantissaBits(position.X);
+                string yMantissaBits = FloatHelper.GetMantissaBits(position.Y);
+                messageLength = IntHelper.ParseBitString(FloatHelper.GetMantissaBitsWithMask(ref xMantissaBits, FrameHelper.FifteenBitsMantissaMask));
+                this.position = IntHelper.ParseBitString(FloatHelper.GetMantissaBitsWithMask(ref yMantissaBits, FrameHelper.FifteenBitsMantissaMask));
                 frameIndex++;
                 return;
             }

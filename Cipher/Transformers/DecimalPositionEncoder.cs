@@ -27,6 +27,11 @@ namespace Cipher.Transformers
                 position = (int?)parameters[0];
             }
 
+            if (!FrameHelper.IsFrameGood(mousePosition, pressedActions))
+            {
+                return mousePosition;
+            }
+
             if (!wroteFirstFrame)
             {
                 FrameHelper.TransformFirstFrame(ref mousePosition, FIRST_FRAME_KEY);
@@ -48,10 +53,15 @@ namespace Cipher.Transformers
         private void transformSecondFrame(ref Vector2 mousePosition, ref InputHelper input, int position)
         {
             int plainTextLength = input.GetLength();
-            string plainTextLengthBinary = Convert.ToString(plainTextLength, 2).PadLeft(23, '0');
-            FloatHelper.ReplaceMantissaBits(ref mousePosition.X, plainTextLengthBinary);
-            string positionBinary = Convert.ToString(position, 2).PadLeft(23, '0');
-            FloatHelper.ReplaceMantissaBits(ref mousePosition.Y, positionBinary);
+            string plainTextLengthBinary = Convert.ToString(plainTextLength, 2).PadLeft(15, '0');
+            string xMantissaBits = FloatHelper.GetMantissaBits(mousePosition.X);
+            FloatHelper.SetMantissaBitsWithMask(ref xMantissaBits, FrameHelper.FifteenBitsMantissaMask, plainTextLengthBinary);
+            FloatHelper.ReplaceMantissaBits(ref mousePosition.X, xMantissaBits);
+
+            string positionBinary = Convert.ToString(position, 2).PadLeft(15, '0');
+            string yMantissaBits = FloatHelper.GetMantissaBits(mousePosition.Y);
+            FloatHelper.SetMantissaBitsWithMask(ref yMantissaBits, FrameHelper.FifteenBitsMantissaMask, positionBinary);
+            FloatHelper.ReplaceMantissaBits(ref mousePosition.Y, yMantissaBits);
         }
 
         private void transformNthFrame(ref Vector2 mousePosition, bool pressedActions, ref InputHelper input, int position)
@@ -60,41 +70,38 @@ namespace Cipher.Transformers
 
             if (bitsLeftToEncode)
             {
-                if (!pressedActions)
+                bool toEncodeX = random.Next(100) < 60;
+                bool toEncodeY = random.Next(100) < 60;
+                int xDecimalValue, yDecimalValue;
+                string xFractionalPart = FloatHelper.GetFraction(ref mousePosition.X).PadRight(position + 1, '0');
+                string yFractionalPart = FloatHelper.GetFraction(ref mousePosition.Y).PadRight(position + 1, '0');
+                int xDigit = int.Parse(xFractionalPart[position].ToString());
+                int yDigit = int.Parse(yFractionalPart[position].ToString());
+
+                if (toEncodeX)
                 {
-                    bool toEncodeX = random.Next(99) < 60;
-                    bool toEncodeY = random.Next(99) < 60;
-                    int xDecimalValue, yDecimalValue;
-                    string xFractionalPart = FloatHelper.GetFraction(ref mousePosition.X).PadRight(position + 1, '0');
-                    string yFractionalPart = FloatHelper.GetFraction(ref mousePosition.Y).PadRight(position + 1, '0');
-                    int xDigit = int.Parse(xFractionalPart[position].ToString());
-                    int yDigit = int.Parse(yFractionalPart[position].ToString());
-
-                    if (toEncodeX)
-                    {
-                        char xMessageBit = input.GetBit();
-                        xDecimalValue = pickClosestValueFromPool(xMessageBit == '1' ? BIT1_POOL : BIT0_POOL, xDigit);
-                    }
-                    else
-                    {
-                        xDecimalValue = pickClosestValueFromPool(NO_MSG_POOL, xDigit);
-                    }
-
-                    if (toEncodeY)
-                    {
-                        char yMessageBit = input.GetBit();
-                        yDecimalValue = pickClosestValueFromPool(yMessageBit == '1' ? BIT1_POOL : BIT0_POOL, yDigit);
-                    }
-                    else
-                    {
-                        yDecimalValue = pickClosestValueFromPool(NO_MSG_POOL, yDigit);
-                    }
-
-                    xFractionalPart = xFractionalPart.Remove(position, 1).Insert(position, xDecimalValue.ToString());
-                    yFractionalPart = yFractionalPart.Remove(position, 1).Insert(position, yDecimalValue.ToString());
-                    FloatHelper.ReplaceFraction(ref mousePosition.X, xFractionalPart);
-                    FloatHelper.ReplaceFraction(ref mousePosition.Y, yFractionalPart);
+                    char xMessageBit = input.GetBit();
+                    xDecimalValue = pickClosestValueFromPool(xMessageBit == '1' ? BIT1_POOL : BIT0_POOL, xDigit);
                 }
+                else
+                {
+                    xDecimalValue = pickClosestValueFromPool(NO_MSG_POOL, xDigit);
+                }
+
+                if (toEncodeY)
+                {
+                    char yMessageBit = input.GetBit();
+                    yDecimalValue = pickClosestValueFromPool(yMessageBit == '1' ? BIT1_POOL : BIT0_POOL, yDigit);
+                }
+                else
+                {
+                    yDecimalValue = pickClosestValueFromPool(NO_MSG_POOL, yDigit);
+                }
+
+                xFractionalPart = xFractionalPart.Remove(position, 1).Insert(position, xDecimalValue.ToString());
+                yFractionalPart = yFractionalPart.Remove(position, 1).Insert(position, yDecimalValue.ToString());
+                FloatHelper.ReplaceFraction(ref mousePosition.X, xFractionalPart);
+                FloatHelper.ReplaceFraction(ref mousePosition.Y, yFractionalPart);
             }
         }
 
@@ -135,6 +142,11 @@ namespace Cipher.Transformers
             Vector2 position = FrameHelper.GetPositionFromFrameObject(ref frame);
             IList actions = FrameHelper.GetActionsFromFrameObject(ref frame);
 
+            if (!FrameHelper.IsFrameGood(position, actions))
+            {
+                return;
+            }
+
             if (frameIndex == 0)
             {
                 string frameKey = FrameHelper.GetPotentialFirstFrameKey(ref position);
@@ -149,16 +161,16 @@ namespace Cipher.Transformers
 
             if (frameIndex == 1)
             {
-                messageLength = IntHelper.ParseBitString(FloatHelper.GetMantissaBits(position.X));
-                string positionString = FloatHelper.GetMantissaBits(position.Y);
-                this.position = IntHelper.ParseBitString(positionString);
+                string xMantissaBits = FloatHelper.GetMantissaBits(position.X);
+                string yMantissaBits = FloatHelper.GetMantissaBits(position.Y);
+                messageLength = IntHelper.ParseBitString(FloatHelper.GetMantissaBitsWithMask(ref xMantissaBits, FrameHelper.FifteenBitsMantissaMask));
+                this.position = IntHelper.ParseBitString(FloatHelper.GetMantissaBitsWithMask(ref yMantissaBits, FrameHelper.FifteenBitsMantissaMask));
                 frameIndex++;
                 return;
             }
 
             if (readBits.Length < messageLength)
             {
-                if (actions.Count > 0) return;
                 string xFractionalPart = FloatHelper.GetFraction(ref position.X).PadRight(this.position + 1, '0');
                 string yFractionalPart = FloatHelper.GetFraction(ref position.Y).PadRight(this.position + 1, '0');
                 int xDigit = int.Parse(xFractionalPart[this.position].ToString());

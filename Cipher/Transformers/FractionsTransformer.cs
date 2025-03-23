@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections;
 using Cipher.Helpers;
 using Cipher.Interfaces;
 using osuTK;
@@ -21,6 +22,11 @@ namespace Cipher.Transformers
 
         public Vector2 Encode(Vector2 mousePosition, bool pressedActions, ref InputHelper input, params object[] parameters)
         {
+            if (!FrameHelper.IsFrameGood(mousePosition, pressedActions))
+            {
+                return mousePosition;
+            }
+
             if (!wroteFirstFrame)
             {
                 FrameHelper.TransformFirstFrame(ref mousePosition, FIRST_FRAME_KEY);
@@ -42,8 +48,10 @@ namespace Cipher.Transformers
         private void transformSecondFrame(ref Vector2 mousePosition, ref InputHelper input)
         {
             int plainTextLength = input.GetLength();
-            string plainTextLengthBinary = Convert.ToString(plainTextLength, 2).PadLeft(23, '0');
-            FloatHelper.ReplaceMantissaBits(ref mousePosition.X, plainTextLengthBinary);
+            string plainTextLengthBinary = Convert.ToString(plainTextLength, 2).PadLeft(15, '0');
+            string xMantissaBits = FloatHelper.GetMantissaBits(mousePosition.X);
+            FloatHelper.SetMantissaBitsWithMask(ref xMantissaBits, FrameHelper.FifteenBitsMantissaMask, plainTextLengthBinary);
+            FloatHelper.ReplaceMantissaBits(ref mousePosition.X, xMantissaBits);
         }
 
         private void transformNthFrame(ref Vector2 mousePosition, ref InputHelper input)
@@ -69,6 +77,12 @@ namespace Cipher.Transformers
         public void ProcessFrame(object frame)
         {
             Vector2 position = FrameHelper.GetPositionFromFrameObject(ref frame);
+            IList actions = FrameHelper.GetActionsFromFrameObject(ref frame);
+
+            if (!FrameHelper.IsFrameGood(position, actions))
+            {
+                return;
+            }
 
             if (frameIndex == 0)
             {
@@ -84,7 +98,8 @@ namespace Cipher.Transformers
 
             if (frameIndex == 1)
             {
-                messageLength = IntHelper.ParseBitString(FloatHelper.GetMantissaBits(position.X));
+                string xMantissaBits = FloatHelper.GetMantissaBits(position.X);
+                messageLength = IntHelper.ParseBitString(FloatHelper.GetMantissaBitsWithMask(ref xMantissaBits, FrameHelper.FifteenBitsMantissaMask));
                 frameIndex++;
                 return;
             }

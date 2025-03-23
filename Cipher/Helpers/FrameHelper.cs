@@ -8,6 +8,8 @@ namespace Cipher.Helpers
 {
     public class FrameHelper
     {
+        public static int FifteenBitsMantissaMask { get; } = 32767;
+
         public static void TransformFirstFrame(ref Vector2 mousePosition, string firstFrameKey)
         {
             if (firstFrameKey.Length != 30)
@@ -17,13 +19,12 @@ namespace Cipher.Helpers
 
             string xBits = firstFrameKey.Substring(0, 15);
             string yBits = firstFrameKey.Substring(15, 15);
-            int mantissaMask = IntHelper.ParseBitString("00000000111111111111111");
 
             string xMantissa = FloatHelper.GetMantissaBits(mousePosition.X);
             string yMantissa = FloatHelper.GetMantissaBits(mousePosition.Y);
 
-            FloatHelper.SetMantissaBitsWithMask(ref xMantissa, mantissaMask, xBits);
-            FloatHelper.SetMantissaBitsWithMask(ref yMantissa, mantissaMask, yBits);
+            FloatHelper.SetMantissaBitsWithMask(ref xMantissa, FifteenBitsMantissaMask, xBits);
+            FloatHelper.SetMantissaBitsWithMask(ref yMantissa, FifteenBitsMantissaMask, yBits);
 
             FloatHelper.ReplaceMantissaBits(ref mousePosition.X, xMantissa);
             FloatHelper.ReplaceMantissaBits(ref mousePosition.Y, yMantissa);
@@ -33,10 +34,9 @@ namespace Cipher.Helpers
         {
             string xMantissa = FloatHelper.GetMantissaBits(mousePosition.X);
             string yMantissa = FloatHelper.GetMantissaBits(mousePosition.Y);
-            int mantissaMask = IntHelper.ParseBitString("00000000111111111111111");
 
-            string xBits = FloatHelper.GetMantissaBitsWithMask(ref xMantissa, mantissaMask);
-            string yBits = FloatHelper.GetMantissaBitsWithMask(ref yMantissa, mantissaMask);
+            string xBits = FloatHelper.GetMantissaBitsWithMask(ref xMantissa, FifteenBitsMantissaMask);
+            string yBits = FloatHelper.GetMantissaBitsWithMask(ref yMantissa, FifteenBitsMantissaMask);
             return xBits + yBits;
         }
 
@@ -52,6 +52,23 @@ namespace Cipher.Helpers
             var fieldInfo = frame.GetType().GetField("Actions");
             var actions = fieldInfo.GetValue(frame) as System.Collections.IList;
             return actions;
+        }
+
+        public static bool IsFrameGood(ref object frame)
+        {
+            Vector2 position = GetPositionFromFrameObject(ref frame);
+            IList actions = GetActionsFromFrameObject(ref frame);
+            return actions.Count == 0 && position.X >= 0 && position.Y >= 0 && position.X < 512 && position.Y < 384;
+        }
+
+        public static bool IsFrameGood(Vector2 position, IList actions)
+        {
+            return actions.Count == 0 && position.X >= 0 && position.Y >= 0 && position.X < 512 && position.Y < 384;
+        }
+
+        public static bool IsFrameGood(Vector2 position, bool pressedActions)
+        {
+            return !pressedActions && position.X >= 0 && position.Y >= 0 && position.X < 512 && position.Y < 384;
         }
     }
 }
