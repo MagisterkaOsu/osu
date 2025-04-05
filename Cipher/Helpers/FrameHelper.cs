@@ -9,6 +9,7 @@ namespace Cipher.Helpers
     public class FrameHelper
     {
         public static int FifteenBitsMantissaMask { get; } = 32767;
+        public static int ThreeBitsMantissaMask { get; } = 7;
 
         public static void TransformFirstFrame(ref Vector2 mousePosition, string firstFrameKey)
         {
