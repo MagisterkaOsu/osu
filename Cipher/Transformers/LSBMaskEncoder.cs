@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections;
 using Cipher.Helpers;
 using Cipher.Interfaces;
 using osuTK;
@@ -9,7 +10,7 @@ namespace Cipher.Transformers
 {
     public class LSBMaskEncoder : IEncoder
     {
-        public static string FIRST_FRAME_KEY { get; } = "1011111110010111100111110111100010111111111100101010101100111110";
+        public static string FIRST_FRAME_KEY { get; } = "000110101010110100011000111101";
         private bool wroteSecondFrame;
         private bool wroteFirstFrame;
         private readonly Random random = new Random();
@@ -25,9 +26,14 @@ namespace Cipher.Transformers
 
             if (mask == null) return mousePosition;
 
+            if (!FrameHelper.IsFrameGood(mousePosition, pressedActions))
+            {
+                return mousePosition;
+            }
+
             if (!wroteFirstFrame)
             {
-                transformFirstFrame(ref mousePosition);
+                FrameHelper.TransformFirstFrame(ref mousePosition, FIRST_FRAME_KEY);
                 wroteFirstFrame = true;
                 return mousePosition;
             }
@@ -43,24 +49,18 @@ namespace Cipher.Transformers
             return mousePosition;
         }
 
-        private void transformFirstFrame(ref Vector2 mousePosition)
-        {
-            // Split FirstFrameKey into two parts
-            string xBits = FIRST_FRAME_KEY.Substring(0, 32);
-            string yBits = FIRST_FRAME_KEY.Substring(32, 32);
-
-            // Write the parts to the mantissas of X and Y
-            FloatHelper.ReplaceBits(ref mousePosition.X, xBits);
-            FloatHelper.ReplaceBits(ref mousePosition.Y, yBits);
-        }
-
         private void transformSecondFrame(ref Vector2 mousePosition, ref InputHelper input, int mask)
         {
             int plainTextLength = input.GetLength();
-            string plainTextLengthBinary = Convert.ToString(plainTextLength, 2).PadLeft(23, '0');
-            FloatHelper.ReplaceMantissaBits(ref mousePosition.X, plainTextLengthBinary);
-            string maskBinary = Convert.ToString(mask, 2).PadLeft(23, '0');
-            FloatHelper.ReplaceMantissaBits(ref mousePosition.Y, maskBinary);
+            string plainTextLengthBinary = Convert.ToString(plainTextLength, 2).PadLeft(15, '0');
+            string xMantissaBits = FloatHelper.GetMantissaBits(mousePosition.X);
+            FloatHelper.SetMantissaBitsWithMask(ref xMantissaBits, FrameHelper.FifteenBitsMantissaMask, plainTextLengthBinary);
+            FloatHelper.ReplaceMantissaBits(ref mousePosition.X, xMantissaBits);
+
+            string maskBinary = Convert.ToString(mask, 2).PadLeft(15, '0');
+            string yMantissaBits = FloatHelper.GetMantissaBits(mousePosition.X);
+            FloatHelper.SetMantissaBitsWithMask(ref yMantissaBits, FrameHelper.FifteenBitsMantissaMask, maskBinary);
+            FloatHelper.ReplaceMantissaBits(ref mousePosition.Y, yMantissaBits);
         }
 
         private void transformNthFrame(ref Vector2 mousePosition, bool pressedActions, ref InputHelper input, int mask)
@@ -73,7 +73,7 @@ namespace Cipher.Transformers
                 string mantissaBits = FloatHelper.GetMantissaBits(mousePosition.X);
                 FloatHelper.SetNthMantissaBit(ref mantissaBits, 0, '0');
                 FloatHelper.ReplaceMantissaBits(ref mousePosition.X, mantissaBits);
-                bool toEncode = !pressedActions && random.Next(2) != 0;
+                bool toEncode = random.Next(2) != 0;
 
                 if (toEncode)
                 {
@@ -99,14 +99,17 @@ namespace Cipher.Transformers
 
         public void ProcessFrame(object frame)
         {
-            var fieldInfo = frame.GetType().GetField("Position");
-            Vector2 position = (Vector2)fieldInfo.GetValue(frame);
+            Vector2 position = FrameHelper.GetPositionFromFrameObject(ref frame);
+            IList actions = FrameHelper.GetActionsFromFrameObject(ref frame);
+
+            if (!FrameHelper.IsFrameGood(position, actions))
+            {
+                return;
+            }
 
             if (frameIndex == 0)
             {
-                string xBits = FloatHelper.GetFloatBits(position.X);
-                string yBits = FloatHelper.GetFloatBits(position.Y);
-                string frameKey = xBits + yBits;
+                string frameKey = FrameHelper.GetPotentialFirstFrameKey(ref position);
 
                 if (frameKey == LSBMaskEncoder.FIRST_FRAME_KEY)
                 {
@@ -118,9 +121,10 @@ namespace Cipher.Transformers
 
             if (frameIndex == 1)
             {
-                messageLength = IntHelper.ParseBitString(FloatHelper.GetMantissaBits(position.X));
-                string maskString = FloatHelper.GetMantissaBits(position.Y);
-                mask = IntHelper.ParseBitString(maskString);
+                string xMantissaBits = FloatHelper.GetMantissaBits(position.X);
+                string yMantissaBits = FloatHelper.GetMantissaBits(position.Y);
+                messageLength = IntHelper.ParseBitString(FloatHelper.GetMantissaBitsWithMask(ref xMantissaBits, FrameHelper.FifteenBitsMantissaMask));
+                mask = IntHelper.ParseBitString(FloatHelper.GetMantissaBitsWithMask(ref yMantissaBits, FrameHelper.FifteenBitsMantissaMask));
                 frameIndex++;
                 return;
             }
