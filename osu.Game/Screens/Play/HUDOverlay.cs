@@ -14,6 +14,7 @@ using osu.Framework.Graphics.Primitives;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Configuration;
+using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.Localisation;
 using osu.Game.Overlays;
@@ -147,6 +148,9 @@ namespace osu.Game.Screens.Play
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
+                        // This display is potentially a duplicate of users with a local ModDisplay in their skins.
+                        // It would be very nice to remove this, but the version here has special logic with regards to replays
+                        // and initial states, so needs a bit of thought before doing so.
                         ModDisplay = CreateModsContainer(),
                     }
                 },
@@ -192,7 +196,7 @@ namespace osu.Game.Screens.Play
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuConfigManager config, INotificationOverlay notificationOverlay)
+        private void load(OsuConfigManager config, RealmKeyBindingStore keyBindingStore, INotificationOverlay notificationOverlay)
         {
             if (drawableRuleset != null)
             {
@@ -211,7 +215,7 @@ namespace osu.Game.Screens.Play
 
                 notificationOverlay?.Post(new SimpleNotification
                 {
-                    Text = NotificationsStrings.ScoreOverlayDisabled(config.LookupKeyBindings(GlobalAction.ToggleInGameInterface))
+                    Text = NotificationsStrings.ScoreOverlayDisabled(keyBindingStore.GetBindingsStringFor(GlobalAction.ToggleInGameInterface))
                 });
             }
 
