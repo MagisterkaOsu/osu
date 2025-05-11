@@ -7,6 +7,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Game.Beatmaps;
@@ -56,6 +57,9 @@ namespace osu.Game.Rulesets.Osu.UI
         {
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
+            BorderColour = ColourInfo.SingleColour(Colour4.White);
+            BorderThickness = 1;
+            Masking = true;
 
             InternalChildren = new Drawable[]
             {
