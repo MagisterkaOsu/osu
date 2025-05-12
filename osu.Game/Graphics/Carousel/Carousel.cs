@@ -36,6 +36,11 @@ namespace osu.Game.Graphics.Carousel
         #region Properties and methods for external usage
 
         /// <summary>
+        /// Called after a filter operation or change in items results in the visible carousel items changing.
+        /// </summary>
+        public Action? NewItemsPresented { private get; init; }
+
+        /// <summary>
         /// Height of the area above the carousel that should be treated as visible due to transparency of elements in front of it.
         /// </summary>
         public float BleedTop { get; set; }
@@ -68,7 +73,7 @@ namespace osu.Game.Graphics.Carousel
         public int ItemsTracked => Items.Count;
 
         /// <summary>
-        /// The number of carousel items currently in rotation for display.
+        /// The items currently in rotation for display.
         /// </summary>
         public int DisplayableItems => carouselItems?.Count ?? 0;
 
@@ -167,6 +172,11 @@ namespace osu.Game.Graphics.Carousel
         protected virtual Task FilterAsync() => filterTask = performFilter();
 
         /// <summary>
+        /// Check whether two models are the same for display purposes.
+        /// </summary>
+        protected virtual bool CheckModelEquality(object x, object y) => ReferenceEquals(x, y);
+
+        /// <summary>
         /// Create a drawable for the given carousel item so it can be displayed.
         /// </summary>
         /// <remarks>
@@ -260,7 +270,7 @@ namespace osu.Game.Graphics.Carousel
 
             // Copy must be performed on update thread for now (see ConfigureAwait above).
             // Could potentially be optimised in the future if it becomes an issue.
-            IEnumerable<CarouselItem> items = new List<CarouselItem>(Items.Select(m => new CarouselItem(m)));
+            List<CarouselItem> items = new List<CarouselItem>(Items.Select(m => new CarouselItem(m)));
 
             await Task.Run(async () =>
             {
@@ -270,6 +280,11 @@ namespace osu.Game.Graphics.Carousel
                     {
                         log($"Performing {filter.GetType().ReadableName()}");
                         items = await filter.Run(items, cts.Token).ConfigureAwait(false);
+
+                        // To avoid shooting ourselves in the foot, ensure that we manifest a list after each filter.
+                        //
+                        // A future improvement may be passing a reference list through each filter rather than copying each time,
+                        // but this is the safest approach.
                     }
 
                     log("Updating Y positions");
@@ -287,13 +302,15 @@ namespace osu.Game.Graphics.Carousel
             Schedule(() =>
             {
                 log("Items ready for display");
-                carouselItems = items.ToList();
+                carouselItems = items;
                 displayedRange = null;
 
                 // Need to call this to ensure correct post-selection logic is handled on the new items list.
                 HandleItemSelected(currentSelection.Model);
 
                 refreshAfterSelection();
+
+                NewItemsPresented?.Invoke();
             });
 
             void log(string text) => Logger.Log($"Carousel[op {cts.GetHashCode().ToString()}] {stopwatch.ElapsedMilliseconds} ms: {text}");
@@ -490,11 +507,11 @@ namespace osu.Game.Graphics.Carousel
 
                 updateItemYPosition(item, ref lastVisible, ref yPos);
 
-                if (ReferenceEquals(item.Model, currentKeyboardSelection.Model))
-                    currentKeyboardSelection = new Selection(item.Model, item, item.CarouselYPosition, i);
+                if (CheckModelEquality(item.Model, currentKeyboardSelection.Model!))
+                    currentKeyboardSelection = new Selection(currentKeyboardSelection.Model, item, item.CarouselYPosition, i);
 
-                if (ReferenceEquals(item.Model, currentSelection.Model))
-                    currentSelection = new Selection(item.Model, item, item.CarouselYPosition, i);
+                if (CheckModelEquality(item.Model, currentSelection.Model!))
+                    currentSelection = new Selection(currentSelection.Model, item, item.CarouselYPosition, i);
             }
 
             // If a keyboard selection is currently made, we want to keep the view stable around the selection.
@@ -578,7 +595,7 @@ namespace osu.Game.Graphics.Carousel
 
                 panel.X = GetPanelXOffset(panel);
 
-                c.Selected.Value = c.Item == currentSelection?.CarouselItem;
+                c.Selected.Value = currentSelection?.CarouselItem != null && CheckModelEquality(c.Item, currentSelection.CarouselItem);
                 c.KeyboardSelected.Value = c.Item == currentKeyboardSelection?.CarouselItem;
                 c.Expanded.Value = c.Item.IsExpanded;
             }
@@ -644,7 +661,10 @@ namespace osu.Game.Graphics.Carousel
 
                 // The case where we're intending to display this panel, but it's already displayed.
                 // Note that we **must compare the model here** as the CarouselItems may be fresh instances due to a filter operation.
-                var existing = toDisplay.FirstOrDefault(i => i.Model == carouselPanel.Item!.Model);
+                //
+                // Reference equality is used here instead of CheckModelEquality intentionally. In order to switch to `CheckModelEquality`,
+                // we need a way to signal to the drawable panels that there is an update.
+                var existing = toDisplay.FirstOrDefault(i => ReferenceEquals(i.Model, carouselPanel.Item!.Model));
 
                 if (existing != null)
                 {

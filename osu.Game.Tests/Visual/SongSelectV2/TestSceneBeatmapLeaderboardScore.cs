@@ -7,6 +7,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Configuration;
@@ -28,7 +29,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.SongSelectV2
 {
-    public partial class TestSceneLeaderboardScore : SongSelectComponentsTestScene
+    public partial class TestSceneBeatmapLeaderboardScore : SongSelectComponentsTestScene
     {
         [Cached]
         private OverlayColourProvider colourProvider { get; set; } = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
@@ -44,18 +45,23 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         {
             AddStep("create content", () =>
             {
-                Children = new Drawable[]
+                Child = new PopoverContainer
                 {
-                    fillFlow = new FillFlowContainer
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Children = new Drawable[]
                     {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                        Spacing = new Vector2(0f, 2f),
-                        Shear = OsuGame.SHEAR,
-                    },
-                    drawWidthText = new OsuSpriteText(),
+                        fillFlow = new FillFlowContainer
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Spacing = new Vector2(0f, 2f),
+                            Shear = OsuGame.SHEAR,
+                        },
+                        drawWidthText = new OsuSpriteText(),
+                    }
                 };
 
                 foreach (var scoreInfo in getTestScores())
@@ -78,22 +84,27 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         {
             AddStep("create content", () =>
             {
-                Children = new Drawable[]
+                Child = new PopoverContainer
                 {
-                    fillFlow = new FillFlowContainer
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Children = new Drawable[]
                     {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                        Spacing = new Vector2(0f, 2f),
-                    },
-                    drawWidthText = new OsuSpriteText(),
+                        fillFlow = new FillFlowContainer
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Spacing = new Vector2(0f, 2f),
+                        },
+                        drawWidthText = new OsuSpriteText(),
+                    }
                 };
 
                 foreach (var scoreInfo in getTestScores())
                 {
-                    fillFlow.Add(new BeatmapLeaderboardScore(scoreInfo)
+                    fillFlow.Add(new BeatmapLeaderboardScore(scoreInfo, sheared: false)
                     {
                         Rank = scoreInfo.Position,
                         IsPersonalBest = scoreInfo.User.Id == 2,
@@ -112,18 +123,23 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             AddStep("create content", () =>
             {
-                Children = new Drawable[]
+                Child = new PopoverContainer
                 {
-                    fillFlow = new FillFlowContainer
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Children = new Drawable[]
                     {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                        Spacing = new Vector2(0f, 2f),
-                        Shear = OsuGame.SHEAR,
-                    },
-                    drawWidthText = new OsuSpriteText(),
+                        fillFlow = new FillFlowContainer
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Spacing = new Vector2(0f, 2f),
+                            Shear = OsuGame.SHEAR,
+                        },
+                        drawWidthText = new OsuSpriteText(),
+                    }
                 };
 
                 var scoreInfo = new ScoreInfo
@@ -141,7 +157,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                         Id = 6602580,
                         Username = @"waaiiru",
                         CountryCode = CountryCode.ES,
-                        CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c1.jpg",
+                        CoverUrl = TestResources.COVER_IMAGE_1,
                     },
                     Date = DateTimeOffset.Now.AddYears(-2),
                 };
@@ -198,7 +214,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                         Id = 6602580,
                         Username = @"waaiiru",
                         CountryCode = CountryCode.ES,
-                        CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c1.jpg",
+                        CoverUrl = TestResources.COVER_IMAGE_1,
                     },
                     Date = DateTimeOffset.Now.AddYears(-2),
                 },
@@ -216,7 +232,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                         Id = 1541390,
                         Username = @"Toukai",
                         CountryCode = CountryCode.CA,
-                        CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c2.jpg",
+                        CoverUrl = TestResources.COVER_IMAGE_2,
                     },
                     Date = DateTimeOffset.Now.AddMonths(-6),
                 },
@@ -260,9 +276,10 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             scores[2].TotalScore = RNG.Next(120_000, 400_000);
             scores[2].MaximumStatistics[HitResult.Great] = 3000;
 
-            scores[1].Mods = new Mod[] { new OsuModHidden(), new OsuModDoubleTime(), new OsuModHardRock(), new OsuModFlashlight() };
+            scores[1].Mods = new Mod[] { new OsuModHidden(), new OsuModDoubleTime { SpeedChange = { Value = 2 } }, new OsuModHardRock(), new OsuModFlashlight() };
             scores[2].Mods = new Mod[] { new OsuModHidden(), new OsuModDoubleTime(), new OsuModHardRock(), new OsuModFlashlight(), new OsuModClassic() };
-            scores[3].Mods = new Mod[] { new OsuModHidden(), new OsuModDoubleTime(), new OsuModHardRock(), new OsuModFlashlight(), new OsuModClassic(), new OsuModDifficultyAdjust() };
+            scores[3].Mods = new Mod[]
+                { new OsuModHidden(), new OsuModDoubleTime(), new OsuModHardRock(), new OsuModFlashlight { ComboBasedSize = { Value = false } }, new OsuModClassic(), new OsuModDifficultyAdjust { CircleSize = { Value = 3.2f } } };
             scores[4].Mods = new ManiaRuleset().CreateAllMods().ToArray();
 
             return scores;

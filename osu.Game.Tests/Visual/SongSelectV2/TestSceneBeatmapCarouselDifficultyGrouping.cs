@@ -6,7 +6,6 @@ using NUnit.Framework;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Carousel;
-using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Filter;
 using osu.Game.Screens.SelectV2;
 using osuTK;
@@ -21,7 +20,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         {
             RemoveAllBeatmaps();
             CreateCarousel();
-            SortBy(new FilterCriteria { Group = GroupMode.Difficulty, Sort = SortMode.Difficulty });
+
+            SortAndGroupBy(SortMode.Difficulty, GroupMode.Difficulty);
 
             AddBeatmaps(10, 3);
             WaitForDrawablePanels();
@@ -33,11 +33,11 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddAssert("no beatmaps visible", () => Carousel.ChildrenOfType<PanelBeatmap>().Count(p => p.Alpha > 0), () => Is.Zero);
             CheckNoSelection();
 
-            ClickVisiblePanel<PanelGroup>(0);
+            ClickVisiblePanel<PanelGroupStarDifficulty>(0);
             AddUntilStep("some beatmaps visible", () => Carousel.ChildrenOfType<PanelBeatmap>().Count(p => p.Alpha > 0), () => Is.GreaterThan(0));
             CheckNoSelection();
 
-            ClickVisiblePanel<PanelGroup>(0);
+            ClickVisiblePanel<PanelGroupStarDifficulty>(0);
             AddUntilStep("no beatmaps visible", () => Carousel.ChildrenOfType<PanelBeatmap>().Count(p => p.Alpha > 0), () => Is.Zero);
             CheckNoSelection();
         }
@@ -88,10 +88,10 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddUntilStep("drawable selection restored", () => GetSelectedPanel()?.Item?.Model, () => Is.EqualTo(selection));
             AddAssert("carousel item is visible", () => GetSelectedPanel()?.Item?.IsVisible, () => Is.True);
 
-            ClickVisiblePanel<PanelGroup>(0);
+            ClickVisiblePanel<PanelGroupStarDifficulty>(0);
             AddUntilStep("carousel item not visible", GetSelectedPanel, () => Is.Null);
 
-            ClickVisiblePanel<PanelGroup>(0);
+            ClickVisiblePanel<PanelGroupStarDifficulty>(0);
             AddUntilStep("carousel item is visible", () => GetSelectedPanel()?.Item?.IsVisible, () => Is.True);
         }
 
@@ -124,12 +124,12 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddAssert("keyboard selected panel is beatmap", GetKeyboardSelectedPanel, Is.TypeOf<PanelBeatmap>);
             AddAssert("selected panel is beatmap", GetSelectedPanel, Is.TypeOf<PanelBeatmap>);
 
-            ClickVisiblePanel<PanelGroup>(0);
-            AddAssert("keyboard selected panel is group", GetKeyboardSelectedPanel, Is.TypeOf<PanelGroup>);
+            ClickVisiblePanel<PanelGroupStarDifficulty>(0);
+            AddAssert("keyboard selected panel is group", GetKeyboardSelectedPanel, Is.TypeOf<PanelGroupStarDifficulty>);
             AddAssert("keyboard selected panel is contracted", () => GetKeyboardSelectedPanel()?.Expanded.Value, () => Is.False);
 
-            ClickVisiblePanel<PanelGroup>(0);
-            AddAssert("keyboard selected panel is group", GetKeyboardSelectedPanel, Is.TypeOf<PanelGroup>);
+            ClickVisiblePanel<PanelGroupStarDifficulty>(0);
+            AddAssert("keyboard selected panel is group", GetKeyboardSelectedPanel, Is.TypeOf<PanelGroupStarDifficulty>);
             AddAssert("keyboard selected panel is expanded", () => GetKeyboardSelectedPanel()?.Expanded.Value, () => Is.True);
 
             AddAssert("selected panel is still beatmap", GetSelectedPanel, Is.TypeOf<PanelBeatmap>);
@@ -175,11 +175,12 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddAssert("no beatmaps visible", () => !GetVisiblePanels<PanelBeatmap>().Any());
 
             // Clicks just above the first group panel should not actuate any action.
-            ClickVisiblePanelWithOffset<PanelGroup>(0, new Vector2(0, -(PanelGroup.HEIGHT / 2 + 1)));
+            ClickVisiblePanelWithOffset<PanelGroupStarDifficulty>(0, new Vector2(0, -(PanelGroupStarDifficulty.HEIGHT / 2 + 1)));
 
             AddAssert("no beatmaps visible", () => !GetVisiblePanels<PanelBeatmap>().Any());
 
-            ClickVisiblePanelWithOffset<PanelGroup>(0, new Vector2(0, -(PanelGroup.HEIGHT / 2)));
+            // add lenience to avoid floating-point inaccuracies at edge.
+            ClickVisiblePanelWithOffset<PanelGroupStarDifficulty>(0, new Vector2(0, -(PanelGroup.HEIGHT / 2 - 1)));
 
             AddUntilStep("wait for beatmaps visible", () => GetVisiblePanels<PanelBeatmap>().Any());
             CheckNoSelection();
@@ -190,6 +191,38 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             ClickVisiblePanelWithOffset<PanelBeatmap>(1, new Vector2(0, (CarouselItem.DEFAULT_HEIGHT / 2 + 1)));
             WaitForGroupSelection(0, 1);
+        }
+
+        [Test]
+        public void TestBasicFiltering()
+        {
+            ApplyToFilter("filter", c => c.SearchText = BeatmapSets[2].Metadata.Title);
+            WaitForFiltering();
+
+            CheckDisplayedGroupsCount(3);
+            CheckDisplayedBeatmapsCount(3);
+
+            CheckNoSelection();
+            SelectNextPanel();
+            Select();
+            SelectNextPanel();
+            Select();
+            WaitForGroupSelection(0, 0);
+
+            for (int i = 0; i < 5; i++)
+                SelectNextPanel();
+
+            Select();
+            SelectNextPanel();
+            Select();
+
+            WaitForGroupSelection(1, 0);
+
+            ApplyToFilter("remove filter", c => c.SearchText = string.Empty);
+            WaitForFiltering();
+
+            CheckDisplayedGroupsCount(3);
+            CheckDisplayedBeatmapsCount(30);
         }
     }
 }
