@@ -3,11 +3,14 @@
 
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
+using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Input.Handlers;
 using osu.Game.Replays;
@@ -31,6 +34,7 @@ namespace osu.Game.Rulesets.Osu.UI
         public new OsuInputManager KeyBindingInputManager => (OsuInputManager)base.KeyBindingInputManager;
 
         public new OsuPlayfield Playfield => (OsuPlayfield)base.Playfield;
+        public Bindable<Size> sizeFullscreen = null!;
 
         protected new OsuRulesetConfigManager Config => (OsuRulesetConfigManager)base.Config;
 
@@ -40,7 +44,7 @@ namespace osu.Game.Rulesets.Osu.UI
         }
 
         [BackgroundDependencyLoader]
-        private void load(ReplayPlayer? replayPlayer)
+        private void load(ReplayPlayer? replayPlayer, GameHost host)
         {
             if (replayPlayer != null)
             {
@@ -60,6 +64,8 @@ namespace osu.Game.Rulesets.Osu.UI
                 // Let's wait for someone to report an issue before spending too much time on it.
                 cursorHideEnabled.BindValueChanged(enabled => Playfield.Cursor.FadeTo(enabled.NewValue ? 0 : 1), true);
             }
+
+            sizeFullscreen = new Bindable<Size>(host.Window.ClientSize);
         }
 
         public override DrawableHitObject<OsuHitObject>? CreateDrawableRepresentation(OsuHitObject h) => null;
@@ -82,7 +88,7 @@ namespace osu.Game.Rulesets.Osu.UI
 
         protected override ReplayInputHandler CreateReplayInputHandler(Replay replay) => new OsuFramedReplayInputHandler(replay);
 
-        protected override ReplayRecorder CreateReplayRecorder(Score score) => new OsuReplayRecorder(score);
+        protected override ReplayRecorder CreateReplayRecorder(Score score) => new OsuReplayRecorder(score, sizeFullscreen.Value);
 
         public override double GameplayStartTime
         {

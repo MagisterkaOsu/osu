@@ -57,9 +57,9 @@ namespace osu.Game.Rulesets.Osu.UI
         {
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
-            BorderColour = ColourInfo.SingleColour(Colour4.White);
-            BorderThickness = 1;
-            Masking = true;
+            // BorderColour = ColourInfo.SingleColour(Colour4.White);
+            // BorderThickness = 1;
+            // Masking = true;
 
             InternalChildren = new Drawable[]
             {

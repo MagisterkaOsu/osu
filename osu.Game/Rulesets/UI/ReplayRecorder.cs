@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -17,6 +18,9 @@ using osu.Game.Scoring;
 using osuTK;
 using Cipher.Helpers;
 using System.IO;
+using osu.Framework.Graphics.Sprites;
+using osu.Game.Overlays;
+using osu.Game.Overlays.Notifications;
 
 namespace osu.Game.Rulesets.UI
 {
@@ -37,6 +41,8 @@ namespace osu.Game.Rulesets.UI
         [Resolved]
         private SpectatorClient spectatorClient { get; set; }
 
+        public Size? fullscreenSize { get; set; } = null!;
+
         protected ReplayRecorder(Score target)
         {
             this.target = target;
@@ -44,6 +50,17 @@ namespace osu.Game.Rulesets.UI
             RelativeSizeAxes = Axes.Both;
 
             Depth = float.MinValue;
+        }
+
+        protected ReplayRecorder(Score target, Size fullscreenSize)
+        {
+            this.target = target;
+
+            RelativeSizeAxes = Axes.Both;
+
+            Depth = float.MinValue;
+
+            this.fullscreenSize = fullscreenSize;
         }
 
         protected override void LoadComplete()
@@ -77,6 +94,11 @@ namespace osu.Game.Rulesets.UI
             recordFrame(true);
         }
 
+        private bool generatedData = false;
+
+        [Resolved]
+        private INotificationOverlay? notificationOverlay { get; set; }
+
         private void recordFrame(bool important)
         {
             var last = target.Replay.Frames.LastOrDefault();
@@ -85,68 +107,87 @@ namespace osu.Game.Rulesets.UI
                 return;
 
             /// ==========================
-            string outputFilePath = "C:\\Users\\a4\\Desktop\\800x600";
-            List<string> float_strings_x = new List<string>();
-            List<string> bit_strings_x = new List<string>();
-            List<string> float_strings_y = new List<string>();
-            List<string> bit_strings_y = new List<string>();
-
-            int screenWidth = 800;
-            int screenHeight = 600;
-
-            int currentX = 0;
-            int currentY = 0;
-
-            for (currentX = 0; currentX < screenWidth; currentX++)
+            if (!generatedData)
             {
-                Vector2 mousePos = new Vector2(currentX, currentY);
-                Vector2? nullableGamePos = ScreenSpaceToGamefield?.Invoke(mousePos);
+                string containingFolderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "osu_replay_data");
+                string outputFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "osu_replay_data", $"{fullscreenSize.Value.Width}x{fullscreenSize.Value.Height}");
 
-                if (nullableGamePos.HasValue)
+                // Check if folder exists and if not create it
+                if (!Directory.Exists(containingFolderPath))
                 {
-                    Vector2 gamePos = nullableGamePos.Value; // Get the actual Vector2 value.
+                    Directory.CreateDirectory(containingFolderPath);
+                }
 
-                    // In System.Numerics.Vector2, components are X and Y (uppercase).
-                    if (gamePos.X >= 0 && gamePos.X < 512)
+                List<string> float_strings_x = new List<string>();
+                List<string> bit_strings_x = new List<string>();
+                List<string> float_strings_y = new List<string>();
+                List<string> bit_strings_y = new List<string>();
+
+                int screenWidth = fullscreenSize.Value.Width;
+                int screenHeight = fullscreenSize.Value.Height;
+
+                int currentX = 0;
+                int currentY = 0;
+
+                for (currentX = 0; currentX < screenWidth; currentX++)
+                {
+                    Vector2 mousePos = new Vector2(currentX, currentY);
+                    Vector2? nullableGamePos = ScreenSpaceToGamefield?.Invoke(mousePos);
+
+                    if (nullableGamePos.HasValue)
                     {
-                        // Convert gamePos.X to a string and add it to the list.
-                        // Using "R" (round-trip) format specifier is recommended for floats
-                        // as it preserves precision if you intend to parse it back to a float later.
-                        float_strings_x.Add(gamePos.X.ToString("R"));
-                        string bitStringX = Cipher.Helpers.FloatHelper.GetFloatBits(gamePos.X);
-                        bit_strings_x.Add(bitStringX);
+                        Vector2 gamePos = nullableGamePos.Value; // Get the actual Vector2 value.
+
+                        // In System.Numerics.Vector2, components are X and Y (uppercase).
+                        if (gamePos.X >= 0 && gamePos.X < 512)
+                        {
+                            // Convert gamePos.X to a string and add it to the list.
+                            // Using "R" (round-trip) format specifier is recommended for floats
+                            // as it preserves precision if you intend to parse it back to a float later.
+                            float_strings_x.Add(gamePos.X.ToString("R"));
+                            string bitStringX = Cipher.Helpers.FloatHelper.GetFloatBits(gamePos.X);
+                            bit_strings_x.Add(bitStringX);
+                        }
                     }
                 }
-            }
 
-            for (currentY = 0; currentY < screenHeight; currentY++)
-            {
-                Vector2 mousePos = new Vector2(currentX, currentY);
-                Vector2? nullableGamePos = ScreenSpaceToGamefield?.Invoke(mousePos);
-
-                if (nullableGamePos.HasValue)
+                for (currentY = 0; currentY < screenHeight; currentY++)
                 {
-                    Vector2 gamePos = nullableGamePos.Value; // Get the actual Vector2 value.
+                    Vector2 mousePos = new Vector2(currentX, currentY);
+                    Vector2? nullableGamePos = ScreenSpaceToGamefield?.Invoke(mousePos);
 
-                    // In System.Numerics.Vector2, components are X and Y (uppercase).
-                    if (gamePos.Y >= 0 && gamePos.Y < 384)
+                    if (nullableGamePos.HasValue)
                     {
-                        // Convert gamePos.X to a string and add it to the list.
-                        // Using "R" (round-trip) format specifier is recommended for floats
-                        // as it preserves precision if you intend to parse it back to a float later.
-                        float_strings_y.Add(gamePos.Y.ToString("R"));
-                        string bitStringY = Cipher.Helpers.FloatHelper.GetFloatBits(gamePos.Y);
-                        bit_strings_y.Add(bitStringY);
+                        Vector2 gamePos = nullableGamePos.Value; // Get the actual Vector2 value.
+
+                        // In System.Numerics.Vector2, components are X and Y (uppercase).
+                        if (gamePos.Y >= 0 && gamePos.Y < 384)
+                        {
+                            // Convert gamePos.X to a string and add it to the list.
+                            // Using "R" (round-trip) format specifier is recommended for floats
+                            // as it preserves precision if you intend to parse it back to a float later.
+                            float_strings_y.Add(gamePos.Y.ToString("R"));
+                            string bitStringY = Cipher.Helpers.FloatHelper.GetFloatBits(gamePos.Y);
+                            bit_strings_y.Add(bitStringY);
+                        }
                     }
                 }
+
+                File.WriteAllLines($"{outputFilePath} float x", float_strings_x);
+                File.WriteAllLines($"{outputFilePath} float y", float_strings_y);
+                File.WriteAllLines($"{outputFilePath} bits x", bit_strings_x);
+                File.WriteAllLines($"{outputFilePath} bits y", bit_strings_y);
+
+                Console.WriteLine("Data written to files successfully.");
+                notificationOverlay?.Post(new SimpleNotification()
+                {
+                    Icon = FontAwesome.Solid.ExclamationCircle,
+                    Text = $"Generated screen playfield data to {outputFilePath}.",
+
+                });
+
+                generatedData = true;
             }
-
-            File.WriteAllLines($"{outputFilePath} float x", float_strings_x);
-            File.WriteAllLines($"{outputFilePath} float y", float_strings_y);
-            File.WriteAllLines($"{outputFilePath} bits x", bit_strings_x);
-            File.WriteAllLines($"{outputFilePath} bits y", bit_strings_y);
-
-            Console.WriteLine("Data written to files successfully.");;
 
             /// =================
 

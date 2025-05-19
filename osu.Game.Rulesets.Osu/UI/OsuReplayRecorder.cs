@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Drawing;
 using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.UI;
@@ -14,6 +15,11 @@ namespace osu.Game.Rulesets.Osu.UI
     {
         public OsuReplayRecorder(Score score)
             : base(score)
+        {
+        }
+
+        public OsuReplayRecorder(Score score, Size fullscreenSize)
+            : base(score, fullscreenSize)
         {
         }
 

@@ -63,10 +63,13 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
         private const int transition_duration = 400;
 
+        private Bindable<Size> clientSize = null!;
+
         [BackgroundDependencyLoader]
         private void load(FrameworkConfigManager config, OsuConfigManager osuConfig, GameHost host)
         {
             window = host.Window;
+            clientSize = new Bindable<Size>(window.ClientSize);
 
             scalingMode = osuConfig.GetBindable<ScalingMode>(OsuSetting.Scaling);
             sizeFullscreen = config.GetBindable<Size>(FrameworkSetting.SizeFullscreen);
