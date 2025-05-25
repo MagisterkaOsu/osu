@@ -129,6 +129,16 @@ namespace osu.Game.Rulesets.UI
                 int currentX = 0;
                 int currentY = 0;
 
+                float minX = float.PositiveInfinity;
+                float minY = float.PositiveInfinity;
+                float maxX = float.NegativeInfinity;
+                float maxY = float.NegativeInfinity;
+
+                int minScreenX = int.MaxValue;
+                int maxScreenX = int.MinValue;
+                int minScreenY = int.MaxValue;
+                int maxScreenY = int.MinValue;
+
                 for (currentX = 0; currentX < screenWidth; currentX++)
                 {
                     Vector2 mousePos = new Vector2(currentX, currentY);
@@ -147,6 +157,9 @@ namespace osu.Game.Rulesets.UI
                             float_strings_x.Add(gamePos.X.ToString("R"));
                             string bitStringX = Cipher.Helpers.FloatHelper.GetFloatBits(gamePos.X);
                             bit_strings_x.Add(bitStringX);
+
+                            if (gamePos.X < minX) {minX = gamePos.X; minScreenX = currentX;}
+                            if (gamePos.X > maxX) {maxX = gamePos.X; maxScreenX = currentX;}
                         }
                     }
                 }
@@ -169,6 +182,9 @@ namespace osu.Game.Rulesets.UI
                             float_strings_y.Add(gamePos.Y.ToString("R"));
                             string bitStringY = Cipher.Helpers.FloatHelper.GetFloatBits(gamePos.Y);
                             bit_strings_y.Add(bitStringY);
+
+                            if (gamePos.Y < minY) { minY = gamePos.Y; minScreenY = currentY;}
+                            if (gamePos.Y > maxY) { maxY = gamePos.Y; maxScreenY = currentY;}
                         }
                     }
                 }
