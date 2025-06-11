@@ -78,7 +78,7 @@ namespace Cipher.Transformers
                 }
                 else
                 {
-                    ascii = random.Next(95, 99);
+                    ascii = random.Next(95, 100);
                     Console.WriteLine($"Letter: - ({ascii})");
                 }
 
